@@ -1,0 +1,85 @@
+/* :global(#app) { */
+    .cover {
+      background: url("../image/cover.jpg") center / cover;
+    }
+  
+    .descriptionSubtitle {
+      font-size: 50;
+      font-weight: normal;
+      color : white;
+      margin-top: 8px;
+    }
+  
+    .descriptionTitle {
+      font-size: 52px;
+      color : white;
+      margin-bottom: 8px;
+    }
+  
+    .descriptionWrapper {
+      padding: 60px 0 0 80px;
+      position: relative;
+    }
+  
+    .descriptionWrapperOverlay {
+      background: rgba(33, 33, 33, 0.5);
+      bottom: 0;
+      height: 100%;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 100%;
+    }
+  
+    .formTitle {
+      font-size: 36px;
+      font-weight: normal;
+      color : white;
+      margin-bottom: 32px;
+    }
+  
+    .fullHeight {
+      min-height: 600px;
+      height: 100vh;
+    }
+  
+    .fullHeightPaddingFix {
+      height: calc(100% + 1rem);
+    } 
+  
+    .inputLabel {
+      font-size: 16px;
+      font-weight: bold;
+      color : white;
+      line-height: 20px;
+      margin-bottom: 4px;
+    }
+  
+    .inputWrapper {
+      margin-bottom: 16px;
+      height: 60px;
+    }
+  
+    .buttonWrapper {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+      height: 60px;
+    }
+  
+    .loginWrapper {
+      color : white;
+      margin: 0 auto;
+      max-width: 440px;
+      padding: 0 20px;
+    }
+    .h1{
+      color : white;
+    }
+    .wrapper {
+      background: #22252a;
+    }
+
+  /* } */
+  
