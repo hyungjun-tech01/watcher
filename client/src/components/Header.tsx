@@ -1,8 +1,9 @@
 import {useCookies} from "react-cookie";
 import {useHistory} from "react-router-dom";
 import Path from "../constants/Paths";
+import ButtonAppBar from "./ButtonAppBar";
 
-function Fix(){
+function Header(){
     const [cookies, setCookie, removeCookie] = useCookies(['UserId','UserName', 'AuthToken']);
     const history = useHistory();
 
@@ -14,7 +15,9 @@ function Fix(){
     }
     
     return (
-        <div>Fix</div>
+        <>
+            <ButtonAppBar />
+        </>
     );
 }
-export default Fix;
+export default Header;

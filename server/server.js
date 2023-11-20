@@ -119,7 +119,7 @@ app.get('/', (req, res)=>{
 
 //login
 app.post('/login', async(req, res) => {
-    console.log(req);
+    console.log('login');
     const {email, password} = req.body;
     try{
         const users = await pool.query('SELECT * FROM user_account WHERE email = $1', [email]);
@@ -142,7 +142,49 @@ app.post('/login', async(req, res) => {
     }
 });
 
-
+// query audit job log 
+app.post('/getauditjob', async(req, res) => {
+    
+    const { userName, 
+        detectPrivacy,
+        sendTimeFrom,
+        sendTimeTo } = req.body;   
+    try{
+        const auditJob = await pool.query(` 
+            select job_log_id as "jobLogId",
+            job_type as "jobType",
+            printer_serial_number as "printerSerialNumber",
+            job_id   as "jobId"   ,
+            user_name as "userName",
+            destination as "destination",
+            send_time as "sendTime",
+            file_name as "fileName",
+            finish_time  as "finishTime",
+            copies as "copies" ,
+            original_pages as "originalPages",
+            detect_privacy  as "detectPrivacy",
+            privacy_text as "privacyText",
+            image_archive_path as "imageArchivePath",
+            text_archive_path as "textArchivePath",
+            origina_job_id   as "originaJobId" 
+            from tbl_audit_job_log
+            where user_name like $1
+            and detect_privacy = $2
+            and send_time >= $3
+            and send_time <= $4`,
+        [userName, 
+            detectPrivacy,
+            sendTimeFrom,
+            sendTimeTo
+        ]);
+        res.json(auditJob.rows);
+        res.end();
+    }catch(err){
+        console.log(err);
+        res.json({message:err});        
+        res.end();
+    }
+});
 
 //signup 계정 생성 
 app.post('/signup', async(req, res) => {

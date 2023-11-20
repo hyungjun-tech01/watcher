@@ -4,7 +4,8 @@ import { Form, Grid, Header, Message } from 'semantic-ui-react';
 import {useForm} from "react-hook-form";
 import {useCookies} from "react-cookie";
 import {apiLoginValidate} from "../api/user";
-//import { IValidateUser,IUser, atomMyUser, atomAllUser} from "../atoms/atomsUser";
+import Path from "../constants/Paths";
+
 
 import {useHistory} from "react-router-dom";
 import { useTranslation } from 'react-i18next';
@@ -78,6 +79,7 @@ function Login(){
         setCookie('UserId', response.userId);
         setCookie('UserName', response.userName);
         setCookie('AuthToken', response.token);
+        history.push(Path.ROOT); 
 
       }
       setIsSubmitting(false);
