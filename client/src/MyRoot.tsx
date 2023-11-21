@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route }  from "react-router-dom";
 
 import Core from './routes/Core';
+import AuditLogView from './routes/AuditLogView';
 import Login from './routes/Login';
 import SampleTest from './routes/SampleTest';
 import Path from './constants/Paths';
@@ -18,8 +19,8 @@ function MyRoot() {
         <Route path = {Path.LOGIN}>
           <Login/>
         </Route>
-        <Route path = {Path.PROJECTS}>
-          <Core/>
+        <Route path = {Path.AUDITLOGVIEW}>
+          <AuditLogView/>
         </Route>
         <Route path = {Path.BOARDS}>
           <Core/>

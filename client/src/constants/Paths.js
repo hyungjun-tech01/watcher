@@ -1,7 +1,7 @@
 
 const ROOT = `/`;
 const LOGIN = `/login`;
-const PROJECTS = `/projects/:id`;
+const AUDITLOGVIEW = `/auditlogview`;
 const BOARDS = `/boards/:id`;
 const CARDS = `/cards/:id`;
 const SAMPLE = `/sample`;
@@ -10,7 +10,7 @@ const BASE_PATH = `http://localhost:38000`;
 export default {
   ROOT,
   LOGIN,
-  PROJECTS,
+  AUDITLOGVIEW,
   BOARDS,
   CARDS,
   SAMPLE,

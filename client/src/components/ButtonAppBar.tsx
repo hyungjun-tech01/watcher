@@ -10,6 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {useCookies} from "react-cookie";
 import {useHistory} from "react-router-dom";
 import Path from "../constants/Paths";
+import PositionedMenu from "./PositionedMenu";
 
 export default function ButtonAppBar() {
   const { t } = useTranslation();
@@ -28,7 +29,6 @@ export default function ButtonAppBar() {
     removeCookie('AuthToken');
     history.push(Path.LOGIN);
 }
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -40,7 +40,7 @@ export default function ButtonAppBar() {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-          <MenuIcon />
+          <PositionedMenu />
           </IconButton>
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
