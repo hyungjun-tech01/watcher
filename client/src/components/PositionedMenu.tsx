@@ -21,6 +21,10 @@ export default function PositionedMenu() {
     handleClose();
     history.push(Path.AUDITLOGVIEW);
   }
+  const handleHome = ()=>{
+    handleClose();
+    history.push(Path.ROOT);
+  }
 
   return (
     <div>
@@ -48,7 +52,7 @@ export default function PositionedMenu() {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={handleClose}>Home</MenuItem>
+        <MenuItem onClick={handleHome}>Home</MenuItem>
         <MenuItem onClick={handleAuditLog}>Audit Log</MenuItem>
       </Menu>
     </div>
