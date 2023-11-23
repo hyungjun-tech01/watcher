@@ -1,3 +1,5 @@
+import React from 'react';
+import { atom } from 'recoil';
 export interface IAuditJobLog{
   jobLogId : number; 
   jobType : string;
@@ -22,3 +24,8 @@ export interface IAuditJobLogQueryCondi{
     sendTimeFrom : string;
     sendTimeTo : string;
 }
+
+export const atomsAuditJobLogData = atom<IAuditJobLog[]>({
+  key: 'auditJobLogData',
+  default: []
+})

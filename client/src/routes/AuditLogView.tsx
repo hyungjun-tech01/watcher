@@ -1,30 +1,29 @@
-import React, { useState,  } from "react";
-
-import {useCookies} from "react-cookie";
-import {useHistory} from "react-router-dom";
+import React from "react";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 import Path from "../constants/Paths";
-
 import Header from "../components/Header";
-import AuditLogViewContent from "../components/AuditLogViewContent";
-
+import AuditLogViewContent from "../components/AuditLogView/AuditLogViewContent";
 
 function AuditLogView(){
   const [cookies, setCookie, removeCookie] = useCookies(['UserId','UserName', 'AuthToken']);
-  const history = useHistory();
+  const navigate = useNavigate();
 
-  if(cookies.AuthToken === undefined || cookies.AuthToken === "" || cookies.AuthToken === null){
+  if(cookies.AuthToken === undefined
+    || cookies.AuthToken === ""
+    || cookies.AuthToken === null) {
       removeCookie('UserId');
       removeCookie('UserName');
       removeCookie('AuthToken');
-      history.push(Path.LOGIN);
+      navigate(Path.LOGIN);
   }  
 
-    return (
-      <>
-          <Header />
-          <AuditLogViewContent  />
-      </>
-    );
+  return (
+    <>
+        <Header />
+        <AuditLogViewContent  />
+    </>
+  );
 }
 
 export default AuditLogView;

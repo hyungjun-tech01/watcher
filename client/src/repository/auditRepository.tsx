@@ -1,0 +1,30 @@
+import { selector } from 'recoil';
+import { atomsAuditJobLogData, IAuditJobLogQueryCondi } from "../atoms/atomsAuditJobLog";
+import Paths from "../constants/Paths";
+const BASE_PATH = Paths.BASE_PATH;
+
+const AuditRepository = selector({
+    key: 'AuditRepo',
+    get: ({getCallback}) => {
+        const loadAuditJobLog = getCallback(({set}) => async (data:IAuditJobLogQueryCondi) => {
+            try{
+                const response = await fetch(`${BASE_PATH}/getauditjob`,{
+                    method: "POST", 
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify(data)
+                   }); 
+                const json = await response.json();
+                if(json.message) {
+                    console.log('loadAuditJobLog: ', json.message);
+                } else {
+                    set(atomsAuditJobLogData, json);
+                }
+            }catch(err){
+                console.error(err);
+            }
+        });
+        return {
+            loadAuditJobLog
+        };
+    },
+});

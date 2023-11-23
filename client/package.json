@@ -7,32 +7,28 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.18",
     "@mui/material": "^5.14.18",
-    "@mui/styled-engine-sc": "^6.0.0-alpha.6",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.62",
-    "@types/react": "^18.2.37",
-    "@types/react-dom": "^18.2.15",
-    "@types/styled-components": "^5.1.30",
+    "@mui/x-data-grid": "^6.18.1",
+    "@types/jest": "^29.5.10",
+    "@types/node": "^20.9.4",
+    "@types/react": "^18.2.38",
+    "@types/react-dom": "^18.2.17",
+    "date-fns": "^2.30.0",
     "i18next-browser-languagedetector": "^7.2.0",
+    "node-sass": "^7.0.3",
+    "npm": "^10.2.4",
     "react": "^18.2.0",
     "react-cookie": "^6.1.1",
-    "react-datepicker": "^4.21.0",
+    "react-datepicker": "^4.23.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.2",
     "react-i18next": "^13.5.0",
     "react-query": "^3.39.3",
-    "react-router-dom": "5.3",
-    "react-scripts": "5.0.1",
+    "react-router-dom": "^6.20.0",
+    "react-scripts": "^5.0.1",
     "recoil": "^0.7.7",
-    "sass": "^1.69.5",
-    "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.4",
-    "styled-components": "^6.1.1",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^3.5.0"
   },
   "scripts": {
     "start": "set PORT=3004 && react-scripts start",
@@ -54,15 +50,17 @@
     ],
     "development": [
       "last 1 chrome version",
+      "last 1 safari version",
       "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 edge version"
     ]
   },
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "index.js",
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "@types/react-router-dom": "^5.3.3"
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }

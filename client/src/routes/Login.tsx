@@ -7,7 +7,7 @@ import {apiLoginValidate} from "../api/user";
 import Path from "../constants/Paths";
 
 
-import {useHistory} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 
 const createMessage = (error:IError) => {
@@ -46,13 +46,14 @@ interface IError {
   message:string;
   type:string;
   content:string;
-}
-function Login(){
+};
+
+const Login = () => {
 
   const { t } = useTranslation();
   const [cookies, setCookie, removeCookie] = useCookies(['UserId', 'UserName','AuthToken']);
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const initErrorContent:IError =  {message:"", type:"", content:""};
 
   const [loginError, setLoginError] = useState<IError>(initErrorContent);
@@ -79,7 +80,7 @@ function Login(){
         setCookie('UserId', response.userId);
         setCookie('UserName', response.userName);
         setCookie('AuthToken', response.token);
-        history.push(Path.ROOT); 
+        navigate(Path.ROOT); 
 
       }
       setIsSubmitting(false);

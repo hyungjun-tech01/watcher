@@ -1,37 +1,23 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route }  from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route }  from "react-router-dom";
 
 import Core from './routes/Core';
 import AuditLogView from './routes/AuditLogView';
 import Login from './routes/Login';
 import SampleTest from './routes/SampleTest';
 import Path from './constants/Paths';
-
-// import 'react-datepicker/dist/react-datepicker.css';
-// import 'photoswipe/dist/photoswipe.css';
-// import 'easymde/dist/easymde.min.css';
 import './styles.module.scss';
 
-function MyRoot() {
+const MyRoot = () => {
   return (
     <Router>
-      <Switch>
-        <Route path = {Path.LOGIN}>
-          <Login/>
-        </Route>
-        <Route path = {Path.AUDITLOGVIEW}>
-          <AuditLogView/>
-        </Route>
-        <Route path = {Path.BOARDS}>
-          <Core/>
-        </Route>
-        <Route path = {Path.SAMPLE}>
-          <SampleTest/>
-        </Route>
-        <Route path = {Path.ROOT}>
-          <Core/>
-        </Route>
-      </Switch>
+      <Routes>
+        <Route path = {Path.LOGIN} element={<Login/>} />
+        <Route path = {Path.AUDITLOGVIEW} element={<AuditLogView/>} />
+        <Route path = {Path.BOARDS} element={<Core/>} />
+        <Route path = {Path.SAMPLE} element={<SampleTest/>} />
+        <Route path = {Path.ROOT} element={<Core/>} />
+      </Routes>
     </Router>
   );
 }

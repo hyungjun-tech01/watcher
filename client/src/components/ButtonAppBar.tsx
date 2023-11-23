@@ -5,29 +5,30 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import { useTranslation } from 'react-i18next';
 import MenuIcon from '@mui/icons-material/Menu';
+
+import { useTranslation } from 'react-i18next';
 import {useCookies} from "react-cookie";
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import Path from "../constants/Paths";
 import PositionedMenu from "./PositionedMenu";
 
 export default function ButtonAppBar() {
   const { t } = useTranslation();
   const [cookies, setCookie, removeCookie] = useCookies(['UserId','UserName', 'AuthToken']);
-  const history = useHistory();
+  const navigate = useNavigate();
   const onClick = () => {
       removeCookie('UserId');
       removeCookie('UserName');
       removeCookie('AuthToken');
-      history.push(Path.LOGIN);
+      navigate(Path.LOGIN);
   }
   
   if(cookies.AuthToken === undefined || cookies.AuthToken === "" || cookies.AuthToken === null){
     removeCookie('UserId');
     removeCookie('UserName');
     removeCookie('AuthToken');
-    history.push(Path.LOGIN);
+    navigate(Path.LOGIN);
 }
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -40,7 +41,7 @@ export default function ButtonAppBar() {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-          <PositionedMenu />
+            <PositionedMenu />
           </IconButton>
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>

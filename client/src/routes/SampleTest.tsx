@@ -1,5 +1,5 @@
  import {apiGetAuditJobLog} from "../api/auditjoblog";
- import {useEffect} from "react";
+ import React, {useEffect} from "react";
  ///// api 호출 sample code 
 function SampleTest(){
     const getData = async()=>{
