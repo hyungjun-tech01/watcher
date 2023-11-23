@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import ErrorBoundary from '../ErrorBoundary';
 
 const columns: GridColDef[] = [
   { field: 'id', headerName: 'ID', width: 70 },
@@ -38,19 +37,17 @@ const rows = [
 const AuditLogTable = () => {
   return (
     <div style={{ height: 400, width: '100%' }}>
-        <ErrorBoundary>
-            <DataGrid
-                rows={rows}
-                columns={columns}
-                initialState={{
-                pagination: {
-                    paginationModel: { page: 0, pageSize: 5 },
-                },
-                }}
-                pageSizeOptions={[5, 10]}
-                checkboxSelection
+      <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{
+          pagination: {
+              paginationModel: { page: 0, pageSize: 5 },
+          },
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
       />
-      </ErrorBoundary>
     </div>
   );
 }
