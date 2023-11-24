@@ -3,10 +3,24 @@ import { atomsAuditJobLogData, IAuditJobLogQueryCondi } from "../atoms/atomsAudi
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
-const AuditRepository = selector({
+export const AuditRepository = selector({
     key: 'AuditRepo',
     get: ({getCallback}) => {
-        const loadAuditJobLog = getCallback(({set}) => async (data:IAuditJobLogQueryCondi) => {
+        const loadAllAuditJobLog = getCallback(({set}) => async () => {
+            try{
+                const response = await fetch(`${BASE_PATH}/getAllAuditJob`);
+                const json = await response.json();
+                if(json.message) {
+                    console.log('loadAuditJobLog: ', json.message);
+                } else {
+                    set(atomsAuditJobLogData, json);
+                }
+            }catch(err){
+                console.error(err);
+                set(atomsAuditJobLogData, []);
+            }
+        });
+        const queryAuditJobLog = getCallback(({set}) => async (data:IAuditJobLogQueryCondi) => {
             try{
                 const response = await fetch(`${BASE_PATH}/getauditjob`,{
                     method: "POST", 
@@ -24,7 +38,8 @@ const AuditRepository = selector({
             }
         });
         return {
-            loadAuditJobLog
+            loadAllAuditJobLog,
+            queryAuditJobLog
         };
     },
 });

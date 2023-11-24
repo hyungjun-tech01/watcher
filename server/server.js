@@ -142,7 +142,36 @@ app.post('/login', async(req, res) => {
     }
 });
 
-// query audit job log 
+// query audit job log
+app.get('/getAllAuditJob', async(req, res) => {
+    try{
+        const auditJob = await pool.query(` 
+            select job_log_id as "jobLogId",
+            job_type as "jobType",
+            printer_serial_number as "printerSerialNumber",
+            job_id   as "jobId"   ,
+            user_name as "userName",
+            destination as "destination",
+            send_time as "sendTime",
+            file_name as "fileName",
+            finish_time  as "finishTime",
+            copies as "copies" ,
+            original_pages as "originalPages",
+            detect_privacy  as "detectPrivacy",
+            privacy_text as "privacyText",
+            image_archive_path as "imageArchivePath",
+            text_archive_path as "textArchivePath",
+            origina_job_id   as "originaJobId" 
+            from tbl_audit_job_log`);
+        res.json(auditJob.rows);
+        res.end();
+    }catch(err){
+        console.log(err);
+        res.json({message:err});        
+        res.end();
+    }
+});
+
 app.post('/getauditjob', async(req, res) => {
     
     const { userName, 

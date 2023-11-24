@@ -1,5 +1,7 @@
 .content {
     background-color: azure;
+    min-height: 528px;
+    height: calc(100vh - 64px);
 }
 
 .searchStack {

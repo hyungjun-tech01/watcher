@@ -31,7 +31,7 @@ export default function ButtonAppBar() {
     navigate(Path.LOGIN);
 }
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, height: 65 }}>
       <AppBar position="static">
         <Toolbar>
           <IconButton
