@@ -1,13 +1,16 @@
 import Checkbox from "@mui/material/Checkbox";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { useTranslation } from "react-i18next";
 import { styled, alpha } from "@mui/material/styles";
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import Paper from '@mui/material/Paper';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from "react-i18next";
+import { getDateNumberForTable } from "../../constants/DateFns";
 import styles from "./AuditLogViewContent.module.scss";
 import AuditLogTable from "./AuditLogTable";
 
@@ -57,14 +60,69 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 function AuditLogViewContent() {
   const [t] = useTranslation();
+  const [ user, setUser ] = useState<string | null>(null);
+  const [ startDate, setStartDate ] = useState<Date>(new Date());
+  const [ endDate, setEndDate ] = useState<Date>(new Date());
+  const [ detect, setDetect ] = useState<boolean>(true);
+
+  const handleChangeDetect = useCallback((event: React.ChangeEvent) => {
+    setDetect((prev) => (!prev));
+  }, []);
+
+  const handleChangeStartDate = useCallback((newDate: Date | null) => {
+    if(newDate) {
+      if(newDate.getTime() < endDate.getTime()) {
+        setStartDate(newDate);
+      }
+    }
+  }, [endDate]);
+
+  const handleChangeEndDate = useCallback((newDate: Date | null) => {
+    if(newDate) {
+      if(newDate.getTime() > startDate.getTime()) {
+        setEndDate(newDate);
+      }
+    }
+  }, [startDate]);
+
+  useEffect(() => {
+    const currentDate = new Date();
+    setEndDate(currentDate);
+    const weekAgo = new Date(currentDate);
+    weekAgo.setDate(currentDate.getDate() - 7);
+    setStartDate(weekAgo);
+  }, []);
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <div className={styles.content}>
-          <Toolbar sx={{ flexGrow: 1, justifyContent: "space-between"}}>
+          <Toolbar sx={{ flexGrow: 1, justifyContent: "space-around"}}>
               <div className={styles.searchStack}>
-                  <Checkbox {...label}>t('common.detectIDInfo')</Checkbox>
+                  <Checkbox {...label} checked={ detect } onChange={ handleChangeDetect }/>
                   <Typography variant="body1" component="div" sx={{ flexGrow: 1 }}>
                   {t("common.detectIDInfo")}
+                  </Typography>
+              </div>
+              <div className={styles.searchStack}>
+                  <Typography variant="body1" component="div" sx={{ flexGrow: 1 }}>
+                    {t("common.from_1")}
+                    <DatePicker
+                      value={startDate}
+                      onChange={(newValue) => handleChangeStartDate(newValue)}
+                      sx={{width: 180}}
+                    />
+                    {t("common.from_2")}
+                  </Typography>
+              </div>
+              <div  className={styles.searchStack}>
+                  <Typography variant="body1" component="div" sx={{ flexGrow: 1 }}>
+                    {t("common.to_1")}
+                    <DatePicker
+                      value={endDate}
+                      onChange={(newValue) => handleChangeEndDate(newValue)}
+                      sx={{width: 180}}
+                    />
+                    {t("common.to_2")}
                   </Typography>
               </div>
               <div  className={styles.searchStack}>
@@ -72,33 +130,24 @@ function AuditLogViewContent() {
                   {t("common.users")}
                   </Typography>
                   <Search>
-                  <SearchIconWrapper>
-                      <SearchIcon />
-                  </SearchIconWrapper>
-                  <StyledInputBase
-                      placeholder={t('common.search')}
-                      inputProps={{ "aria-label": "search" }}
-                  />
+                    <SearchIconWrapper>
+                        <SearchIcon />
+                    </SearchIconWrapper>
+                    <StyledInputBase
+                        placeholder={t('common.search')}
+                        inputProps={{ "aria-label": "search" }}
+                    />
                   </Search>
               </div>
           </Toolbar>
-          <Toolbar sx={{ flexGrow: 1, justifyContent: "center"}}>
-              <div className={styles.searchStack}>
-                  <Typography variant="body1" component="div" sx={{ flexGrow: 1 }}>
-                    {t("common.from_1")}
-                    <DatePicker />
-                    {t("common.from_2")}
-                  </Typography>
-              </div>
-              <div  className={styles.searchStack}>
-                  <Typography variant="body1" component="div" sx={{ flexGrow: 1 }}>
-                    {t("common.to_1")}
-                    <DatePicker />
-                    {t("common.to_2")}
-                  </Typography>
-              </div>
-          </Toolbar>
-          <AuditLogTable/>
+          <Paper elevation={3} sx={{ m : 2, minHeight: 400 }}>
+            <AuditLogTable
+              userName={user}
+              detectValue={detect}
+              fromTime={getDateNumberForTable(startDate)}
+              toTime={getDateNumberForTable(endDate)}
+            />
+          </Paper>
       </div>
     </LocalizationProvider>
   );

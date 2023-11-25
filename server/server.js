@@ -177,9 +177,10 @@ app.post('/getauditjob', async(req, res) => {
     const { userName, 
         detectPrivacy,
         sendTimeFrom,
-        sendTimeTo } = req.body;   
+        sendTimeTo } = req.body;
+    console.log('Input Value : ', userName, detectPrivacy, sendTimeFrom, sendTimeTo);
     try{
-        const auditJob = await pool.query(` 
+        const auditJob = userName ? await pool.query(` 
             select job_log_id as "jobLogId",
             job_type as "jobType",
             printer_serial_number as "printerSerialNumber",
@@ -198,14 +199,33 @@ app.post('/getauditjob', async(req, res) => {
             origina_job_id   as "originaJobId" 
             from tbl_audit_job_log
             where user_name like $1
-            and detect_privacy = $2
-            and send_time >= $3
-            and send_time <= $4`,
-        [userName, 
-            detectPrivacy,
-            sendTimeFrom,
-            sendTimeTo
-        ]);
+                and detect_privacy = $2
+                and send_time >= $3
+                and send_time <= $4`,
+            [userName, detectPrivacy, sendTimeFrom, sendTimeTo]
+        ) : await pool.query(` 
+            select job_log_id as "jobLogId",
+            job_type as "jobType",
+            printer_serial_number as "printerSerialNumber",
+            job_id   as "jobId"   ,
+            user_name as "userName",
+            destination as "destination",
+            send_time as "sendTime",
+            file_name as "fileName",
+            finish_time  as "finishTime",
+            copies as "copies" ,
+            original_pages as "originalPages",
+            detect_privacy  as "detectPrivacy",
+            privacy_text as "privacyText",
+            image_archive_path as "imageArchivePath",
+            text_archive_path as "textArchivePath",
+            origina_job_id   as "originaJobId" 
+            from tbl_audit_job_log
+            where detect_privacy = $1
+                and send_time >= $2
+                and send_time <= $3`,
+            [detectPrivacy, sendTimeFrom, sendTimeTo]
+        );
         res.json(auditJob.rows);
         res.end();
     }catch(err){

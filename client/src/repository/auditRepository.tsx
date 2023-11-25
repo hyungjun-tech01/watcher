@@ -4,7 +4,7 @@ import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
 export const AuditRepository = selector({
-    key: 'AuditRepo',
+    key: 'AuditRepository',
     get: ({getCallback}) => {
         const loadAllAuditJobLog = getCallback(({set}) => async () => {
             try{
@@ -21,6 +21,7 @@ export const AuditRepository = selector({
             }
         });
         const queryAuditJobLog = getCallback(({set}) => async (data:IAuditJobLogQueryCondi) => {
+            console.log('queryAuditJobLog is called');
             try{
                 const response = await fetch(`${BASE_PATH}/getauditjob`,{
                     method: "POST", 
