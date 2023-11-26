@@ -85,6 +85,10 @@ function AuditLogViewContent() {
     }
   }, [startDate]);
 
+  const handleChangeUser = useCallback((event:any) => {
+    setUser(event.target.value);
+}, [setUser]);
+
   useEffect(() => {
     const currentDate = new Date();
     setEndDate(currentDate);
@@ -136,6 +140,8 @@ function AuditLogViewContent() {
                     <StyledInputBase
                         placeholder={t('common.search')}
                         inputProps={{ "aria-label": "search" }}
+                        value={user}
+                        onChange={handleChangeUser}
                     />
                   </Search>
               </div>
