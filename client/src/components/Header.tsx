@@ -16,7 +16,7 @@ function Header(){
     
     return (
         <>
-            <ButtonAppBar />
+            <ButtonAppBar/>
         </>
     );
 }

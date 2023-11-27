@@ -32,12 +32,12 @@ export default function ButtonAppBar() {
 }
   return (
     <Box sx={{ flexGrow: 1, height: 65 }}>
-      <AppBar position="static">
+      <AppBar position="static" sx={{backgroundColor: "#00b050"}}>
         <Toolbar>
           <IconButton
             size="large"
             edge="start"
-            color="inherit"
+            color="primary"
             aria-label="menu"
             sx={{ mr: 2 }}
           >
