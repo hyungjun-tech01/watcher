@@ -64,13 +64,13 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
   }, [])
 
   const columns: GridColDef[] = [
-    { field: 'imageArchivePath', headerName: t('common.image'), width: 125, headerClassName: 'data-table-hearder' },
+    { field: 'imageArchivePath', headerName: t('common.image'), flex: 0.5, headerClassName: 'data-table-hearder' },
     { field: 'sendTime', headerName: t('common.workTime'), width: 150, headerClassName: 'data-table-hearder' },
     { field: 'userName',
       headerName: t('common.users'),
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
-      width: 75,
+      width: 100,
       headerClassName: 'data-table-hearder'
     },
     { field: 'destination', headerName: t('common.destination'), width: 150, headerClassName: 'data-table-hearder' },
@@ -78,7 +78,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
     { field: 'copies', headerName: t('common.copies'), type: 'number', width: 50, headerClassName: 'data-table-hearder' },
     { field: 'originalPages', headerName: t('common.pages'), type: 'number', width: 50, headerClassName: 'data-table-hearder' },
     { field: 'detectPrivacy', headerName: t('common.detected'), type: 'boolean', width: 75, headerClassName: 'data-table-hearder' },
-    { field: 'privacyText', headerName: t('common.detect_result'), width: 250, headerClassName: 'data-table-hearder' },
+    { field: 'privacyText', headerName: t('common.detect_result'), flex: 1, headerClassName: 'data-table-hearder' },
   ];
 
   useEffect(() =>{

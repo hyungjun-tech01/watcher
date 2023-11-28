@@ -104,6 +104,7 @@ const core = {
       fromComputer_title: 'From Computer',
       fromTrello: 'From Trello',
       general: 'General',
+      helper_date: 'MM/DD/YYYY',
       hours: 'Hours',
       image: 'Image',
       importBoard_title: 'Import Board',

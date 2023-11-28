@@ -1,3 +1,4 @@
+import i18n from "../i18n";
 export const convertToDataString = (timeValue: String) => {
 
     const year = Number('20' + timeValue.slice(0, 2));
@@ -11,7 +12,8 @@ export const convertToDataString = (timeValue: String) => {
     const date = new Date(year, month - 1, day, hour, minute, second);
 
     // Format the date as 'MMM DD, YYYY, h:mm:ss A'
-    const dateString = date.toLocaleString('en-US', {
+    const localeString = i18n.resolvedLanguage === 'ko' ? 'ko-KR' : 'en-US';
+    const dateString = date.toLocaleString(localeString, {
         month: 'short',
         day: 'numeric',
         year: 'numeric',

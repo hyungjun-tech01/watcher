@@ -79,6 +79,7 @@ const core = {
       from_2: '부터',
       fromComputer: '이 PC로부터',
       general : 'General',
+      helper_date: '월/일/년',
       hours: '시',
       image: '이미지',
       invalidEmailOrUsername: '이메일주소나 비밀번호가 오류입니다.',
