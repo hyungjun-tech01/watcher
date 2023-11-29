@@ -11,8 +11,6 @@ import {
   CssBaseline,
   FormControlLabel,
   Grid,
-  Link,
-  Paper,
   TextField,
   Typography,
 } from "@mui/material";
@@ -37,11 +35,11 @@ const Copyright = (props: any) => {
   );
 };
 
+
 const createMessage = (error: IError) => {
   if (!error) {
     return error;
   }
-  console.log("createMessage", error.message);
   switch (error.message) {
     case "Invalid email or password":
       return {
@@ -53,13 +51,13 @@ const createMessage = (error: IError) => {
       return {
         ...error,
         type: "warning",
-        content: "common.noInternetConnection",
+        content: "common.serverConnectionFailed",
       };
     case "Network request failed":
       return {
         ...error,
         type: "warning",
-        content: "common.serverConnectionFailed",
+        content: "common.noInternetConnection",
       };
     default:
       return {
@@ -153,6 +151,7 @@ const Login = () => {
               name="email"
               autoComplete="email"
               autoFocus
+              onClick={onMessageDismiss}
             />
             <TextField
               margin="normal"
@@ -163,6 +162,7 @@ const Login = () => {
               type="password"
               id="password"
               autoComplete="current-password"
+              helperText= {t(loginError.content)}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
@@ -177,7 +177,7 @@ const Login = () => {
                    ":hover": { backgroundColor: "#0D7621FF" }
                   }}
             >
-              로그인
+              {t("action.Login")}
             </Button>
             <Grid container>
             </Grid>
