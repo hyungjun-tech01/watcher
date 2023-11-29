@@ -4,7 +4,7 @@ import {useCookies} from "react-cookie";
 import ButtonAppBar from "./ButtonAppBar";
 
 function Header(){
-    const [cookies, setCookie, removeCookie] = useCookies(['UserId','UserName', 'AuthToken']);
+    const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
     // const navigate = useNavigate();
 
     // if(cookies.AuthToken === undefined || cookies.AuthToken === "" || cookies.AuthToken === null){

@@ -30,9 +30,7 @@ const Copyright = (props: any) => {
       {...props}
     >
       {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Watch-Web
-      </Link>{" "}
+        Watcher-Web &nbsp;
       {new Date().getFullYear()}
       {"."}
     </Typography>
@@ -83,9 +81,9 @@ const initErrorContent: IError = { message: "", type: "", content: "" };
 const Login = () => {
   const { t } = useTranslation();
   const [cookies, setCookie, removeCookie] = useCookies([
-    "UserId",
-    "UserName",
-    "AuthToken",
+    "WatcherWebUserId",
+    "WatcherWebUserName",
+    "WatcherWebAuthToken",
   ]);
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState<IError>(initErrorContent);
@@ -114,13 +112,13 @@ const Login = () => {
 
     if (response.message) {
       setLoginError(createMessage(response));
-      removeCookie("UserId");
-      removeCookie("UserName");
-      removeCookie("AuthToken");
+      removeCookie("WatcherWebUserId");
+      removeCookie("WatcherWebUserName");
+      removeCookie("WatcherWebAuthToken");
     } else {
-      setCookie("UserId", response.userId);
-      setCookie("UserName", response.userName);
-      setCookie("AuthToken", response.token);
+      setCookie("WatcherWebUserId", response.userId);
+      setCookie("WatcherWebUserName", response.userName);
+      setCookie("WatcherWebAuthToken", response.token);
       navigate(Path.ROOT);
     }
     setIsSubmitting(false);
@@ -173,9 +171,12 @@ const Login = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3, mb: 2 , 
+                   backgroundColor:"rgba(25,137,43,255)",
+                   ":hover": { backgroundColor: "rgba(13,118,33,255)" }
+                  }}
             >
-              Log In
+              로그인
             </Button>
             <Grid container>
             </Grid>

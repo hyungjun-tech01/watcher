@@ -9,13 +9,13 @@ import Content from "../components/Content";
 
 
 function Core(){
-  const [cookies, setCookie, removeCookie] = useCookies(['UserId','UserName', 'AuthToken']);
+  const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
   const navigate = useNavigate();
 
-  if(cookies.AuthToken === undefined || cookies.AuthToken === "" || cookies.AuthToken === null){
-      removeCookie('UserId');
-      removeCookie('UserName');
-      removeCookie('AuthToken');
+  if(cookies.WatcherWebAuthToken === undefined || cookies.WatcherWebAuthToken === "" || cookies.WatcherWebAuthToken === null){
+      removeCookie('WatcherWebUserId');
+      removeCookie('WatcherWebUserName');
+      removeCookie('WatcherWebAuthToken');
       navigate(Path.LOGIN);
   }  
 

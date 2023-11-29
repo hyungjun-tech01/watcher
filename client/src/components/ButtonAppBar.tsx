@@ -15,19 +15,19 @@ import PositionedMenu from "./PositionedMenu";
 
 export default function ButtonAppBar() {
   const { t } = useTranslation();
-  const [cookies, setCookie, removeCookie] = useCookies(['UserId','UserName', 'AuthToken']);
+  const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
   const navigate = useNavigate();
   const onClick = () => {
-      removeCookie('UserId');
-      removeCookie('UserName');
-      removeCookie('AuthToken');
+      removeCookie('WatcherWebUserId');
+      removeCookie('WatcherWebUserName');
+      removeCookie('WatcherWebAuthToken');
       navigate(Path.LOGIN);
   }
   
-  if(cookies.AuthToken === undefined || cookies.AuthToken === "" || cookies.AuthToken === null){
-    removeCookie('UserId');
-    removeCookie('UserName');
-    removeCookie('AuthToken');
+  if(cookies.WatcherWebAuthToken === undefined || cookies.WatcherWebAuthToken === "" || cookies.WatcherWebAuthToken === null){
+    removeCookie('WatcherWebUserId');
+    removeCookie('WatcherWebUserName');
+    removeCookie('WatcherWebAuthToken');
     navigate(Path.LOGIN);
 }
   return (
