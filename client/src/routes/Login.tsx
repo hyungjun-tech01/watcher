@@ -104,6 +104,7 @@ const Login = () => {
 
   const onMessageDismiss = () => {
     setLoginError(initErrorContent);
+    console.log('loginError',loginError);
     
   };
   const onValid = async (data: any) => {
@@ -172,8 +173,8 @@ const Login = () => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 , 
-                   backgroundColor:"rgba(25,137,43,255)",
-                   ":hover": { backgroundColor: "rgba(13,118,33,255)" }
+                   backgroundColor:"#19892BFF",
+                   ":hover": { backgroundColor: "#0D7621FF" }
                   }}
             >
               로그인
