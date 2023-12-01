@@ -1,0 +1,16 @@
+
+.container {    
+    display : flex;                      // container이름의 객체에 스타일링 해주기
+
+    margin-top: 0px;
+};
+
+ .sidebar {
+   flex:1;
+   min-width: 150px;
+   color : white;
+   background-color: black;
+};
+.content {
+    flex:8;
+ }; 

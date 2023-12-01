@@ -31,23 +31,13 @@ export default function ButtonAppBar() {
     navigate(Path.LOGIN);
 }
   return (
-    <Box sx={{ flexGrow: 1, height: 65 }}>
+    <Box sx={{ flexGrow: 1, height: 40 }}>
       <AppBar position="static" sx={{backgroundColor: "#19892BFF"}}>
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="primary"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <PositionedMenu />
-          </IconButton>
-
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          {t('common.productName')}
+        <Toolbar sx={{height: 40}}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, height: 60, }}>
+            Home &gt; path
           </Typography>
-          <Button color="inherit" onClick ={onClick}>Logout</Button>
+          <Button color="inherit" sx={{ height: 10 }}onClick ={onClick}>Logout</Button>
         </Toolbar>
       </AppBar>
     </Box>

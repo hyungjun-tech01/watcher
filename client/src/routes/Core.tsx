@@ -5,8 +5,9 @@ import {useNavigate} from "react-router-dom";
 import Path from "../constants/Paths";
 
 import Header from "../components/Header";
+import SideBar from "../components/SideBar";
 import Content from "../components/Content";
-
+import styles from "./route.module.scss";
 
 function Core(){
   const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
@@ -21,8 +22,17 @@ function Core(){
 
     return (
       <>
-          <Header />
-          <Content  />
+
+          <div className={styles.container}>
+            <div className ={styles.sidebar}>
+              <SideBar />
+            </div>
+            <div className ={styles.content}>
+              <Header />
+              <Content  />
+            </div>
+          </div>
+
       </>
     );
 }

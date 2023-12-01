@@ -36,7 +36,6 @@ export default function PositionedMenu() {
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
       >
-      <MenuIcon />
       </Button>
       <Menu
         id="demo-positioned-menu"

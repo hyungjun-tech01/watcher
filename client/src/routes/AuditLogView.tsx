@@ -3,7 +3,9 @@ import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import Path from "../constants/Paths";
 import Header from "../components/Header";
+import SideBar from "../components/SideBar";
 import AuditLogViewContent from "../components/AuditLogView/AuditLogViewContent";
+import styles from "./route.module.scss";
 
 function AuditLogView(){
   const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
@@ -17,11 +19,17 @@ function AuditLogView(){
       removeCookie('WatcherWebAuthToken');
       navigate(Path.LOGIN);
   }  
-
   return (
     <>
-        <Header />
-        <AuditLogViewContent  />
+    <div className={styles.container}>
+            <div className ={styles.sidebar}>
+              <SideBar />
+            </div>
+            <div className ={styles.content}>
+              <Header />
+              <AuditLogViewContent  />
+            </div>
+          </div>
     </>
   );
 }
