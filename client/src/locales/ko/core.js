@@ -32,6 +32,11 @@ const core = {
     },
     action:{
       Login: '로그인',
+    },
+    menu:{
+      auditlogview:'Audit Log',
+      home:'Home',
+      
     }
   },
 };

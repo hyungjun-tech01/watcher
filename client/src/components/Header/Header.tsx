@@ -3,8 +3,11 @@ import {useCookies} from "react-cookie";
 // import Path from "../constants/Paths";
 import ButtonAppBar from "./ButtonAppBar";
 
-function Header(){
-    const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
+interface IHeader{
+    path:string;
+}
+function Header({path}:IHeader){
+    //const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
     // const navigate = useNavigate();
 
     // if(cookies.AuthToken === undefined || cookies.AuthToken === "" || cookies.AuthToken === null){
@@ -16,7 +19,7 @@ function Header(){
     
     return (
         <>
-            <ButtonAppBar/>
+            <ButtonAppBar path={path}/>
         </>
     );
 }

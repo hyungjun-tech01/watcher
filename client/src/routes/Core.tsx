@@ -4,8 +4,8 @@ import {useCookies} from "react-cookie";
 import {useNavigate} from "react-router-dom";
 import Path from "../constants/Paths";
 
-import Header from "../components/Header";
-import SideBar from "../components/SideBar";
+import Header from "../components/Header/Header";
+import SideBar from "../components/SideBar/SideBar";
 import Content from "../components/Content";
 import styles from "./route.module.scss";
 
@@ -22,17 +22,15 @@ function Core(){
 
     return (
       <>
-
           <div className={styles.container}>
             <div className ={styles.sidebar}>
               <SideBar />
             </div>
             <div className ={styles.content}>
-              <Header />
+              <Header path={'Home'}/>
               <Content  />
             </div>
           </div>
-
       </>
     );
 }

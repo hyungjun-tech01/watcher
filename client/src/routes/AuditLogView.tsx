@@ -1,16 +1,17 @@
 import React from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import Path from "../constants/Paths";
-import Header from "../components/Header";
-import SideBar from "../components/SideBar";
+import Header from "../components/Header/Header";
+import SideBar from "../components/SideBar/SideBar";
 import AuditLogViewContent from "../components/AuditLogView/AuditLogViewContent";
 import styles from "./route.module.scss";
 
 function AuditLogView(){
   const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   if(cookies.WatcherWebAuthToken === undefined
     || cookies.WatcherWebAuthToken === ""
     || cookies.WatcherWebAuthToken === null) {
@@ -26,7 +27,7 @@ function AuditLogView(){
               <SideBar />
             </div>
             <div className ={styles.content}>
-              <Header />
+              <Header path={t('menu.home')+' > '+t('menu.auditlogview')}/>
               <AuditLogViewContent  />
             </div>
           </div>

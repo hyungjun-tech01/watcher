@@ -10,10 +10,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useTranslation } from 'react-i18next';
 import {useCookies} from "react-cookie";
 import {useNavigate} from "react-router-dom";
-import Path from "../constants/Paths";
-import PositionedMenu from "./PositionedMenu";
+import Path from "../../constants/Paths";
 
-export default function ButtonAppBar() {
+interface IButtonAppBar{
+  path:string;
+}
+export default function ButtonAppBar({path}:IButtonAppBar) {
   const { t } = useTranslation();
   const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
   const navigate = useNavigate();
@@ -31,14 +33,14 @@ export default function ButtonAppBar() {
     navigate(Path.LOGIN);
 }
   return (
-    <Box sx={{ flexGrow: 1, height: 40 }}>
-      <AppBar position="static" sx={{backgroundColor: "#19892BFF"}}>
-        <Toolbar sx={{height: 40}}>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, height: 60, }}>
-            Home &gt; path
+    <Box  sx={{ flexGrow: 1 }}>
+      <AppBar position="static" sx={{ mr:2, backgroundColor: "#19892BFF"}}>
+      <Toolbar> 
+          <Typography component="div" sx={{ flexGrow: 1,  }}>
+            {path}
           </Typography>
-          <Button color="inherit" sx={{ height: 10 }}onClick ={onClick}>Logout</Button>
-        </Toolbar>
+          <Button color="inherit" onClick ={onClick}>Logout</Button>
+          </Toolbar>
       </AppBar>
     </Box>
   );
