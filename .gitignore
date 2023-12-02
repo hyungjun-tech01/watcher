@@ -4,3 +4,4 @@ server/node_modules
 .prettierrcv
 server/uploads
 .prettierrc
+server/ImageLog

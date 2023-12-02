@@ -21,10 +21,10 @@ const fsSync = require('fs');
 
 
 try {
-    fsUpper.readdirSync('uploads');
+    fsUpper.readdirSync('ImageLog');
 } catch (error) {
-  console.error('uploads 폴더가 없어 uploads 폴더를 생성합니다.');
-  fsUpper.mkdirSync('uploads');
+  console.error('ImageLog  폴더가 없어 ImageLog  폴더를 생성합니다.');
+  fsUpper.mkdirSync('ImageLog');
 }
 
 const storage = multer.memoryStorage(); 
@@ -36,7 +36,7 @@ const MYHOST  = process.env.MYHOST ? "http://"+process.env.MYHOST+":"+PORT:"http
 app.use(cors());
 app.use(express.json()); 
 app.use(express.urlencoded( {extended : false } ));
-app.use('/uploads', express.static('uploads'));
+app.use('/ImageLog', express.static('ImageLog'));
 
 // util.promisify를 사용하여 fs.writeFile을 프로미스로 변환합니다.
 const writeFileAsync = util.promisify(fs.writeFile);
@@ -58,14 +58,14 @@ app.post('/upload', upload.single('file'),async (req, res) => {
 
     // /카드 id 폴더가 없으면 생성 
     try {
-        fsUpper.readdirSync(`uploads/${cardId}`);
+        fsUpper.readdirSync(`ImageLog/${cardId}`);
     } catch (error) {
-        console.error('uploads/cardid  폴더가 없어 cardid 폴더를 생성합니다.');
-        fsUpper.mkdirSync(`uploads/${cardId}`);
+        console.error('ImageLog/cardid  폴더가 없어 cardid 폴더를 생성합니다.');
+        fsUpper.mkdirSync(`ImageLog/${cardId}`);
     }
 
     // 이미지를 저장할 경로 및 파일 이름
-    const filePath = `uploads/${cardId}/${fileName}`;
+    const filePath = `ImageLog/${cardId}/${fileName}`;
     try {
     // 이미지 데이터를 바이너리로 변환하여 파일에 저장 (동기) -> 앞에 await를 붙히면 프로세스가 안 끝남.
         writeFileAsync(filePath, fileData, 'binary');
@@ -83,7 +83,7 @@ app.post('/upload', upload.single('file'),async (req, res) => {
 app.post('/deleteFile', async (req, res) => {
     const {cardId, fileExt, fileName} = req.body;
     // 이미지를 삭제할 경로 및 파일 이름
-    const filePath = `uploads/${cardId}/${fileName}`;
+    const filePath = `ImageLog/${cardId}/${fileName}`;
     try {
         // 파일이 존재하는지 확인
          const fileStats = await fs.stat(filePath);
