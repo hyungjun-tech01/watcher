@@ -178,6 +178,7 @@ app.post('/getauditjob', async(req, res) => {
         detectPrivacy,
         sendTimeFrom,
         sendTimeTo } = req.body;
+    const transferDetectprivacy = detectPrivacy? true:null;    
     console.log('Input Value : ', userName, detectPrivacy, sendTimeFrom, sendTimeTo);
     try{
         const auditJob = await pool.query(` 
@@ -199,10 +200,10 @@ app.post('/getauditjob', async(req, res) => {
             origina_job_id   as "originaJobId" 
             from tbl_audit_job_log
             where user_name like '%'||$1||'%'
-                and detect_privacy = $2
+                and detect_privacy = COALESCE($2, detect_privacy)
                 and send_time >= $3
                 and send_time <= $4`,
-            [userName, detectPrivacy, sendTimeFrom, sendTimeTo]
+            [userName, transferDetectprivacy, sendTimeFrom, sendTimeTo]
         ) ;
         // : await pool.query(` 
         //     select job_log_id as "jobLogId",
