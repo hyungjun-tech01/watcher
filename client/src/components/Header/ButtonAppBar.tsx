@@ -33,13 +33,16 @@ export default function ButtonAppBar({path}:IButtonAppBar) {
     navigate(Path.LOGIN);
 }
   return (
-    <Box  sx={{ flexGrow: 1 }}>
+    <Box  sx={{ flexGrow: 1 , mb:0}}>
       <AppBar position="static" sx={{ mr:2, backgroundColor: "#19892BFF"}}>
       <Toolbar> 
           <Typography component="div" sx={{ flexGrow: 1,  }}>
             {path}
           </Typography>
-          <Button color="inherit" onClick ={onClick}>Logout</Button>
+          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <Button color="inherit" onClick ={onClick} >Logout</Button>
+          </Box>
           </Toolbar>
       </AppBar>
     </Box>

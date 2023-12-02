@@ -110,12 +110,12 @@ function AuditLogViewContent() {
       <Toolbar sx={{ flexGrow: 1,  justifyContent: "space-around" }}>
         <div className={styles.searchStack}>
           <Checkbox {...label} checked={detect} onChange={handleChangeDetect} />
-          <Typography variant="body1" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
             {t("common.detectIDInfo")}
           </Typography>
         </div>
         <div className={styles.searchStack}>
-          <Typography variant="body1" component="div" sx={{ flexGrow: 1, lineHeight: 3.5 }}>
+          <Typography variant="body2" component="div" sx={{ flexGrow: 1, lineHeight: 4.0 }}>
             {t("common.from_1")}
             <DatePicker
               value={startDate}
@@ -126,7 +126,7 @@ function AuditLogViewContent() {
           </Typography>
         </div>
         <div className={styles.searchStack}>
-          <Typography variant="body1" component="div" sx={{ flexGrow: 1, lineHeight: 3.5 }}>
+          <Typography variant="body2" component="div" sx={{ flexGrow: 1, lineHeight: 4.0 }}>
             {t("common.to_1")}
             <DatePicker
               value={endDate}
@@ -137,7 +137,7 @@ function AuditLogViewContent() {
           </Typography>
         </div>
         <div className={styles.searchStack}>
-          <Typography variant="body1" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
             {t("common.users")}
           </Typography>
           <Search>
