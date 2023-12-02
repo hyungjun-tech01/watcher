@@ -10,8 +10,6 @@ const fsUpper = require('fs');
 const path = require('path');
 
 
-
-
 //const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs').promises; // fs.promises를 사용하여 비동기 파일 작업을 수행합니다.
@@ -40,6 +38,7 @@ app.use('/ImageLog', express.static('ImageLog'));
 
 // util.promisify를 사용하여 fs.writeFile을 프로미스로 변환합니다.
 const writeFileAsync = util.promisify(fs.writeFile);
+
 // promisify를 사용하여 fs.unlink를 비동기 함수로 변환
 // const unlinkAsync = util.promisify(fs.unlink);
 const unlinkSync = fs.unlink;
@@ -113,6 +112,7 @@ app.post('/deleteFile', async (req, res) => {
 
 // home  test
 app.get('/', (req, res)=>{
+    console.log("test....");
     res.send("Service is started");
 });
 
@@ -182,27 +182,28 @@ app.post('/getauditjob', async(req, res) => {
     try{
         const auditJob = await pool.query(` 
             select job_log_id as "jobLogId",
-            job_type as "jobType",
-            printer_serial_number as "printerSerialNumber",
-            job_id   as "jobId"   ,
-            user_name as "userName",
-            destination as "destination",
-            send_time as "sendTime",
-            file_name as "fileName",
-            finish_time  as "finishTime",
-            copies as "copies" ,
-            original_pages as "originalPages",
-            detect_privacy  as "detectPrivacy",
-            privacy_text as "privacyText",
-            image_archive_path as "imageArchivePath",
-            text_archive_path as "textArchivePath",
-            origina_job_id   as "originaJobId" 
+                job_type as "jobType",
+                printer_serial_number as "printerSerialNumber",
+                job_id   as "jobId"   ,
+                user_name as "userName",
+                destination as "destination",
+                send_time as "sendTime",
+                file_name as "fileName",
+                finish_time  as "finishTime",
+                copies as "copies" ,
+                original_pages as "originalPages",
+                detect_privacy  as "detectPrivacy",
+                privacy_text as "privacyText",
+                image_archive_path,
+                text_archive_path as "textArchivePath",
+                origina_job_id   as "originaJobId",
+                $5||'/ImageLog/'||image_archive_path as "imageArchivePath"
             from tbl_audit_job_log
             where user_name like '%'||$1||'%'
                 and detect_privacy = $2
                 and send_time >= $3
                 and send_time <= $4`,
-            [userName, detectPrivacy, sendTimeFrom, sendTimeTo]
+            [userName, detectPrivacy, sendTimeFrom, sendTimeTo, MYHOST]
         ) ;
         // : await pool.query(` 
         //     select job_log_id as "jobLogId",
@@ -289,6 +290,23 @@ app.post('/signup', async(req, res) => {
             res.json({message:err});
         }
     }
+});
+
+//pdf file 연결
+app.get('/ImageLog/:year/:month/:fileName', function(req, res) {
+    const year = req.params.year;
+    const month = req.params.month;
+    const fileName = req.params.fileName;
+    const filePath = path.join('ImageLog', year, month, fileName);
+
+    if (fsUpper.existsSync(filePath)) {
+        res.contentType("application/pdf");
+        fsUpper.createReadStream(filePath).pipe(res);
+    } else {
+        res.status(500);
+        console.log('File not found');
+        res.send('File not found');
+    };
 });
 
 

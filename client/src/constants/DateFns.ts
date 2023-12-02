@@ -17,6 +17,7 @@ export const convertToDataString = (timeValue: String) => {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
+    }) + '\n' + date.toLocaleString(localeString, {
         hour: 'numeric',
         minute: 'numeric',
         second: 'numeric',
@@ -41,6 +42,7 @@ export const getDateStringForTable = (timeValue: Date) => {
     const output = yearString + monthString + monthString + dateString + hourString + minuteString + secondString;
     return output;
 }
+
 export const getDateNumberForTable = (timeValue: Date) => {
     const yearValue = timeValue.getFullYear();
     const year = yearValue - Math.floor(yearValue/100)*100;
