@@ -7,9 +7,10 @@
 
  .sidebar {
    flex:1;
-   min-width: 150px;
-   color : white;
-   background-color: black;
+   min-width: 180px;
+   background-color: #0e1e2d;
+   height : 100vh;
+   position : sticky;
 };
 .content {
     flex:8;

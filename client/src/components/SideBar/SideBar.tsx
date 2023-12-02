@@ -1,6 +1,8 @@
 import {useNavigate} from "react-router-dom";
 import { useTranslation } from 'react-i18next';
+import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 import Path from "../../constants/Paths";
+import styles from "./SideBar.module.scss";
 
 function SideBar(){
     const navigate = useNavigate();
@@ -12,12 +14,13 @@ function SideBar(){
 //        navigate(Path.ROOT);
 //      }
     return(
-        <div className="sidebarWrapper">
-            <div className="sidebarMenu">
-                <h3 className="sidebarTitle">  {t('common.productName')}</h3>
-                <ul className="sidevarList">
-                    <li className="sidebarListItem" onClick={handleAuditLog}>
-                    {t('menu.auditlogview')}
+        <div className={styles.sidebarWrapper}>
+            <div className= {styles.sidebarMenu}>
+                <h3 className= {styles.sidebarTitle}>  {t('common.productName')}</h3>
+                <ul className={styles.sidebarList}>
+                    <li className={styles.sidebarListItem}  onClick={handleAuditLog}>
+                        <ContentPasteSearchIcon />
+                        {t('menu.auditlogview')}
                     </li>
                 </ul>
             </div>
