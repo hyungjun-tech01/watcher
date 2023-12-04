@@ -164,10 +164,6 @@ const Login = () => {
               autoComplete="current-password"
               helperText= {t(loginError.content)}
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button
               type="submit"
               fullWidth

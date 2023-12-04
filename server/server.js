@@ -204,7 +204,7 @@ app.post('/getauditjob', async(req, res) => {
                 and detect_privacy = COALESCE($2, detect_privacy)
                 and send_time >= $3
                 and send_time <= $4`,
-            [userName, transferDetectPrivacy, sendTimeFrom, sendTimeTo, MYHOST]
+            [userName, transferDetectprivacy, sendTimeFrom, sendTimeTo, MYHOST]
         ) ;
         // : await pool.query(` 
         //     select job_log_id as "jobLogId",

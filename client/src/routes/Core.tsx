@@ -3,6 +3,8 @@ import React, { useState,  } from "react";
 import {useCookies} from "react-cookie";
 import {useNavigate} from "react-router-dom";
 import Path from "../constants/Paths";
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
 
 import Header from "../components/Header/Header";
 import SideBar from "../components/SideBar/SideBar";
@@ -21,17 +23,19 @@ function Core(){
   }  
 
     return (
-      <>
-          <div className={styles.container}>
-            <div className ={styles.sidebar}>
+      <Container>
+        <div className={styles.container}>
+          <Grid container>  
+            <Grid item xs={2}>
               <SideBar />
-            </div>
-            <div className ={styles.content}>
+            </Grid> 
+            <Grid item xs={10}>
               <Header path={'Home'}/>
               <Content  />
-            </div>
-          </div>
-      </>
+            </Grid>
+          </Grid>
+        </div>
+      </Container>
     );
 }
 

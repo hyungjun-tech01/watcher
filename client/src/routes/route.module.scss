@@ -6,12 +6,13 @@
 };
 
  .sidebar {
-   flex:1;
+   flex:1;  
    min-width: 180px;
+   max-width: 200px;
    background-color: #0e1e2d;
    height : 100vh;
-   position : sticky;
+   position : sticky; 
 };
-.content {
-    flex:8;
+.content { 
+  flex:8; 
  }; 

@@ -110,6 +110,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
       const found_idx = value.lastIndexOf('.');
       if(found_idx !== -1){
         const thumbnail_src = value?.slice(0, found_idx) + '_thumbnail.png';
+        const replace_thumbnail_src = thumbnail_src.replace(/\\/g,'/');
         const fileExt = value.slice(found_idx + 1).toLowerCase();
         const isThisPdf = fileExt === 'pdf';
         return (
@@ -123,7 +124,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
               handleOpen();
             }}}
           >
-            <img src={thumbnail_src} alt='' />
+            <img src={replace_thumbnail_src} alt='' />
           </div>
         );
       };
