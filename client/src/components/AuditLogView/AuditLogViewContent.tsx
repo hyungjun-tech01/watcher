@@ -104,7 +104,6 @@ function AuditLogViewContent() {
     weekAgo.setDate(currentDate.getDate() - 7);
     setStartDate(weekAgo);
   }, []);
-
   return (
     <div className={styles.content}>
       <Toolbar sx={{ flexGrow: 1,  justifyContent: "space-around" }}>
@@ -153,7 +152,8 @@ function AuditLogViewContent() {
           </Search>
         </div>
       </Toolbar>
-      <Paper elevation={3} sx={{ m: 2, minHeight: 400 }}>
+
+      <Paper elevation={3} sx={{ m: 2, height: 600  }}>
         <AuditLogTable
           userName={user}
           detectValue={detect}

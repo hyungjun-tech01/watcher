@@ -124,7 +124,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
               handleOpen();
             }}}
           >
-            <img src={replace_thumbnail_src} alt='' />
+            <img width="94px" height="94px" src={replace_thumbnail_src} alt='' />
           </div>
         );
       };
@@ -171,13 +171,13 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
 
   return (
     <>
-      <Box sx={{ height: 400, width: '100%', '& .data-table-hearder': {
+      <Box sx={{ height: 600, width: '100%', '& .data-table-hearder': {
         backgroundColor: '#283f4f', color: '#fff',
       }}}>
         <DataGrid
             rows={rowData}
             columns={columns}
-            rowHeight={ 120 }
+            rowHeight={ 100 }
             initialState={{
               pagination: {
                   paginationModel: { page: 0, pageSize: 5 },

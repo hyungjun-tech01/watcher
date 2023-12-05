@@ -1,7 +1,6 @@
 
 .container {    
     display : flex;                      // container이름의 객체에 스타일링 해주기
-
     margin-top: 0px;
 };
 
@@ -10,9 +9,12 @@
    min-width: 180px;
    max-width: 200px;
    background-color: #0e1e2d;
+   min-height : 765px;
    height : 100vh;
    position : sticky; 
 };
 .content { 
   flex:8; 
+  min-height : 765px;
+  height : 100vh;  
  }; 
