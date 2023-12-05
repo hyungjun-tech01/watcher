@@ -247,7 +247,22 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
             width: '75%',
             p: 4, }}>
               <h2>Document Processing</h2>
-            {textContent}
+            {textContent&&(
+              <pre>
+                {
+                  // 개행문자를 기준으로 문자를 잘라(split) 배열로 만들고 
+                  //배열 사이사이 <br />태그를 넣어 뿌려줘서 개행을 넣은 효과를 내준다.
+                  textContent.split("\\n").map((line) => {
+                  return (
+                      <span>
+                          {line}
+                          <br />
+                      </span>
+                  );
+                  })
+                }
+              </pre>
+            )}
           </Box>)
         }
       </Modal>
