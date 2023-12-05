@@ -102,7 +102,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
         const fileExt = value.slice(found_idx + 1).toLowerCase();
         const isThisPdf = fileExt === 'pdf';
         return (
-          <div style={{alignItems:'center', textAlign: 'center'}} onClick={()=>{
+          <div style={{alignItems:'center', textAlign: 'center', cursor:'pointer'}} onClick={()=>{
             if(isThisPdf) {
               console.log('Open pdf !!!');
               window.open(value);
@@ -152,7 +152,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
           hour12: true,
       });
       return (
-        <div style={{display:'block'}} onClick={()=>{
+        <div style={{display:'block', cursor:'pointer'}} onClick={()=>{
             if(value.textPath && value.textPath !== "") {
               console.log('Open text !!!');
               setIsImage(false);
@@ -255,7 +255,22 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
             width: '75%',
             p: 4, }}>
               <h2>Document Processing</h2>
-            {textContent}
+            {textContent&&(
+              <pre>
+                {
+                  // 개행문자를 기준으로 문자를 잘라(split) 배열로 만들고 
+                  //배열 사이사이 <br />태그를 넣어 뿌려줘서 개행을 넣은 효과를 내준다.
+                  textContent.split("\\n").map((line) => {
+                  return (
+                      <span>
+                          {line}
+                          <br />
+                      </span>
+                  );
+                  })
+                }
+              </pre>
+            )}
           </Box>)
         }
       </Modal>
