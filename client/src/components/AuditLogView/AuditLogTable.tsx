@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { atomsAuditJobLogData, IAuditJobLog, IAuditJobLogQueryCondi } from '../../atoms/atomsAuditJobLog';
 import { AuditRepository } from '../../repository/auditRepository';
 import { useRecoilValue } from 'recoil';
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
+import { ReactComponent as NoImage } from '../../image/noun-no-image.svg';
 
 interface IAuditLogTable {
   userName: string | null,
@@ -105,6 +107,8 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
 
   const linkImage =  useCallback((props: GridRenderCellParams<any, string>) => {
     const { value } = props;
+
+    console.log('linkImage', value);
     
     if(value) {
       const found_idx = value.lastIndexOf('.');
@@ -128,6 +132,10 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
           </div>
         );
       };
+    }else{
+      <div>
+        <NoImage />
+      </div>
     };
     return "";
   }, [handleOpen]);
