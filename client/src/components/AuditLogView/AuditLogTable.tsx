@@ -98,7 +98,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
         const fileExt = value.slice(found_idx + 1).toLowerCase();
         const isThisPdf = fileExt === 'pdf';
         return (
-          <div style={{alignItems:'center', textAlign: 'center'}} onClick={()=>{
+          <div style={{alignItems:'center', textAlign: 'center', cursor:'pointer'}} onClick={()=>{
             if(isThisPdf) {
               console.log('Open pdf !!!');
               window.open(value);
@@ -144,7 +144,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
           hour12: true,
       });
       return (
-        <div style={{display:'block'}} onClick={()=>{
+        <div style={{display:'block', cursor:'pointer'}} onClick={()=>{
             if(value.textPath && value.textPath !== "") {
               console.log('Open text !!!');
               setIsImage(false);
