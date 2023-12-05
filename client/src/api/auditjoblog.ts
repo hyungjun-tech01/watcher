@@ -15,4 +15,4 @@ export async function  apiGetAuditJobLog(data:IAuditJobLogQueryCondi) {
         console.error(err);
         return(err);
     }
- }
+ };
