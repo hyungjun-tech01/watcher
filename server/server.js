@@ -4,25 +4,25 @@ const pool = require('./db');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
 // multer 미들웨어 사용
 const multer = require('multer');
 const fsUpper = require('fs');
 const path = require('path');
-
 
 //const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs').promises; // fs.promises를 사용하여 비동기 파일 작업을 수행합니다.
 const util = require('util');
 
-const fsSync = require('fs');
-
+const ImageLog = "ImageLog";
+const TextLog = "TextLog";
 
 try {
-    fsUpper.readdirSync('ImageLog');
+    fsUpper.readdirSync(ImageLog);
 } catch (error) {
-  console.error('ImageLog  폴더가 없어 ImageLog  폴더를 생성합니다.');
-  fsUpper.mkdirSync('ImageLog');
+    console.error(`${ImageLog} 폴더가 없어 ${ImageLog} 폴더를 생성합니다.`);
+    fsUpper.mkdirSync(ImageLog);
 }
 
 const storage = multer.memoryStorage(); 
@@ -34,7 +34,8 @@ const MYHOST  = process.env.MYHOST ? "http://"+process.env.MYHOST+":"+PORT:"http
 app.use(cors());
 app.use(express.json()); 
 app.use(express.urlencoded( {extended : false } ));
-app.use('/ImageLog', express.static('ImageLog'));
+app.use(`/${ImageLog}`, express.static(ImageLog));
+app.use(`/${ImageLog}`, express.static(TextLog));
 
 // util.promisify를 사용하여 fs.writeFile을 프로미스로 변환합니다.
 const writeFileAsync = util.promisify(fs.writeFile);
@@ -57,14 +58,14 @@ app.post('/upload', upload.single('file'),async (req, res) => {
 
     // /카드 id 폴더가 없으면 생성 
     try {
-        fsUpper.readdirSync(`ImageLog/${cardId}`);
+        fsUpper.readdirSync(`${ImageLog}/${cardId}`);
     } catch (error) {
         console.error('ImageLog/cardid  폴더가 없어 cardid 폴더를 생성합니다.');
-        fsUpper.mkdirSync(`ImageLog/${cardId}`);
+        fsUpper.mkdirSync(`${ImageLog}/${cardId}`);
     }
 
     // 이미지를 저장할 경로 및 파일 이름
-    const filePath = `ImageLog/${cardId}/${fileName}`;
+    const filePath = `${ImageLog}/${cardId}/${fileName}`;
     try {
     // 이미지 데이터를 바이너리로 변환하여 파일에 저장 (동기) -> 앞에 await를 붙히면 프로세스가 안 끝남.
         writeFileAsync(filePath, fileData, 'binary');
@@ -82,7 +83,7 @@ app.post('/upload', upload.single('file'),async (req, res) => {
 app.post('/deleteFile', async (req, res) => {
     const {cardId, fileExt, fileName} = req.body;
     // 이미지를 삭제할 경로 및 파일 이름
-    const filePath = `ImageLog/${cardId}/${fileName}`;
+    const filePath = `${ImageLog}/${cardId}/${fileName}`;
     try {
         // 파일이 존재하는지 확인
          const fileStats = await fs.stat(filePath);
@@ -115,7 +116,6 @@ app.get('/', (req, res)=>{
     console.log("test....");
     res.send("Service is started");
 });
-
 
 //login
 app.post('/login', async(req, res) => {
@@ -196,9 +196,10 @@ app.post('/getauditjob', async(req, res) => {
                 detect_privacy  as "detectPrivacy",
                 privacy_text as "privacyText",
                 image_archive_path,
-                text_archive_path as "textArchivePath",
+                text_archive_path,
                 origina_job_id   as "originaJobId",
-                $5||'/ImageLog/'||image_archive_path as "imageArchivePath"
+                $5||'/ImageLog/'||image_archive_path as "imageArchivePath",
+                $5||'/TextLog/'||text_archive_path as "textArchivePath"
             from tbl_audit_job_log
             where user_name like '%'||$1||'%'
                 and detect_privacy = COALESCE($2, detect_privacy)
@@ -294,7 +295,7 @@ app.post('/signup', async(req, res) => {
 });
 
 //pdf file 연결
-app.get('/ImageLog/:year/:month/:fileName', function(req, res) {
+app.get(`/${ImageLog}/:year/:month/:fileName`, function(req, res) {
     const year = req.params.year;
     const month = req.params.month;
     const fileName = req.params.fileName;
@@ -310,7 +311,22 @@ app.get('/ImageLog/:year/:month/:fileName', function(req, res) {
     };
 });
 
+//txt file 연결
+app.get(`/${TextLog}/:year/:month/:fileName`, function(req, res) {
+    const year = req.params.year;
+    const month = req.params.month;
+    const fileName = req.params.fileName;
+    const filePath = path.join('ImageLog', year, month, fileName);
 
+    if (fsUpper.existsSync(filePath)) {
+        res.contentType("application/text charset=utf8");
+        fsUpper.createReadStream(filePath).pipe(res);
+    } else {
+        res.status(500);
+        console.log('File not found');
+        res.send('File not found');
+    };
+});
 
 app.listen(PORT, ()=> {
     console.log(`Server running on PORT ${PORT}`);

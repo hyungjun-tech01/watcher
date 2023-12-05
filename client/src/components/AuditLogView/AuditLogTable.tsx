@@ -1,7 +1,7 @@
 import * as React from 'react';
 import i18n from "../../i18n";
 import { useCallback, useEffect, useState } from 'react';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
 import { Box, Modal } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { atomsAuditJobLogData, IAuditJobLog, IAuditJobLogQueryCondi } from '../../atoms/atomsAuditJobLog';
@@ -19,6 +19,7 @@ interface IAuditLogTable {
 interface IAuditLogRowData {
   jobLogId: number,
   imageArchivePath: string,
+  textArchivePath: string,
   sendTime: string,
   userName: string,
   destination: string,
@@ -37,7 +38,9 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
   const [open, setOpen] = useState(false);
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
-  const [imagePath, setImagePath] = useState<string>("");
+  const [itemPath, setItemPath] = useState<string>("");
+  const [isImage, setIsImage] = useState(false);
+  const [textContent, setTextContent] = useState<string>("");
 
   const queryLogData = useCallback(()=>{
     if(fromTime >= toTime) return;
@@ -56,6 +59,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
       {
         jobLogId: data.jobLogId,
         imageArchivePath: data.imageArchivePath,
+        textArchivePath: data.textArchivePath,
         sendTime:data.sendTime,
         userName: data.userName,
         destination: data.destination,
@@ -69,15 +73,67 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
     setRowData(updatedRowData);
   }, []);
 
-  const convToDate = useCallback((props: GridRenderCellParams<any, string>) => {
+  const getTextInTextPath = useCallback(async (path:string) => {
+    try{
+      const replace_path = path.replace(/\\/g,'/');
+      const response =  await fetch(`${replace_path}`);
+      const text = response.text();
+      text.then((data)=> {
+        setTextContent(data);
+        handleOpen();
+      })
+    }
+    catch(error) {
+      console.log('Fail to get Text from file in server');
+      setTextContent("");
+    }
+  }, [handleOpen]);
+
+  const renderImageCell =  useCallback((props: GridRenderCellParams<any, string>) => {
     const { value } = props;
-    if(value) {
-      const year = Number('20' + value.slice(0, 2));
-      const month = Number(value.slice(2, 4));
-      const day = Number(value.slice(4, 6));
-      const hour = Number(value.slice(6, 8));
-      const minute = Number(value.slice(8, 10));
-      const second = Number(value.slice(10));
+
+    console.log('linkImage', value);
+    
+    if(value && value !=="") {
+      const found_idx = value.lastIndexOf('.');
+      if(found_idx !== -1){
+        const thumbnail_src = value?.slice(0, found_idx) + '_thumbnail.png';
+        const replace_thumbnail_src = thumbnail_src.replace(/\\/g,'/');
+        const fileExt = value.slice(found_idx + 1).toLowerCase();
+        const isThisPdf = fileExt === 'pdf';
+        return (
+          <div style={{alignItems:'center', textAlign: 'center'}} onClick={()=>{
+            if(isThisPdf) {
+              console.log('Open pdf !!!');
+              window.open(value);
+            } else {
+              console.log('Show image !!!');
+              setIsImage(true);
+              setItemPath(value);
+              handleOpen();
+            }}}
+          >
+            <img width="94px" height="94px" src={replace_thumbnail_src} alt='' />
+          </div>
+        );
+      };
+    }else{
+      <div>
+        <NoImage />
+      </div>
+    };
+    return "";
+  }, [handleOpen]);
+
+  const renderSendTimeCell =  useCallback((props: GridRenderCellParams<any, {sendTime:string, textPath:string}>) => {
+    const { value } = props;
+    if(value && value.sendTime && value.sendTime !=="") {
+      const year = Number('20' + value.sendTime.slice(0, 2));
+      const month = Number(value.sendTime.slice(2, 4));
+      const day = Number(value.sendTime.slice(4, 6));
+      const hour = Number(value.sendTime.slice(6, 8));
+      const minute = Number(value.sendTime.slice(8, 10));
+      const second = Number(value.sendTime.slice(10));
   
       // Create a Date object using the extracted values
       const date = new Date(year, month - 1, day, hour, minute, second);
@@ -96,62 +152,37 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
           hour12: true,
       });
       return (
-        <div style={{display:'block'}}>
+        <div style={{display:'block'}} onClick={()=>{
+            if(value.textPath && value.textPath !== "") {
+              console.log('Open text !!!');
+              setIsImage(false);
+              getTextInTextPath(value.textPath);
+            }
+          }}>
           <div>{dateString}</div>
           <div>{timeString}</div>
         </div>
       );
-    }
-    return "";
-  }, []);
-
-  const linkImage =  useCallback((props: GridRenderCellParams<any, string>) => {
-    const { value } = props;
-
-    console.log('linkImage', value);
-    
-    if(value) {
-      const found_idx = value.lastIndexOf('.');
-      if(found_idx !== -1){
-        const thumbnail_src = value?.slice(0, found_idx) + '_thumbnail.png';
-        const replace_thumbnail_src = thumbnail_src.replace(/\\/g,'/');
-        const fileExt = value.slice(found_idx + 1).toLowerCase();
-        const isThisPdf = fileExt === 'pdf';
-        return (
-          <div style={{alignItems:'center', textAlign: 'center'}} onClick={()=>{
-            if(isThisPdf) {
-              console.log('Open pdf !!!');
-              window.open(value);
-            } else {
-              console.log('Show image !!!');
-              setImagePath(value);
-              handleOpen();
-            }}}
-          >
-            <img width="94px" height="94px" src={replace_thumbnail_src} alt='' />
-          </div>
-        );
-      };
-    }else{
-      <div>
-        <NoImage />
-      </div>
     };
     return "";
-  }, [handleOpen]);
+  }, [getTextInTextPath]);
 
   const columns: GridColDef[] = [
     { field: 'imageArchivePath',
       headerName: t('common.image'),
       width: 120,
       headerClassName: 'data-table-hearder',
-      renderCell: linkImage,
+      renderCell: renderImageCell,
     },
     { field: 'sendTime',
       headerName: t('common.workTime'),
       width: 120,
       headerClassName: 'data-table-hearder',
-      renderCell: convToDate,
+      valueGetter: (params: GridValueGetterParams) =>({
+        sendTime: params.row.sendTime,
+        textPath: params.row.textArchivePath,
+      }),
+      renderCell: renderSendTimeCell,
     },
     { field: 'userName',
       headerName: t('common.users'),
@@ -179,19 +210,20 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
 
   return (
     <>
-      <Box sx={{ height: 600, width: '100%', '& .data-table-hearder': {
+      <Box sx={{ width: '100%', '& .data-table-hearder': {
         backgroundColor: '#283f4f', color: '#fff',
       }}}>
         <DataGrid
             rows={rowData}
             columns={columns}
-            rowHeight={ 100 }
+            autoHeight
+            rowHeight={ 120 }
             initialState={{
               pagination: {
                   paginationModel: { page: 0, pageSize: 5 },
               },
             }}
-            pageSizeOptions={[5, 10]}
+            pageSizeOptions={[5, 10, 20]}
             getRowId={(row) => row?.jobLogId}
             sx={{ fontSize: 12 }}
         />
@@ -202,17 +234,30 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
         aria-labelledby="parent-modal-title"
         aria-describedby="parent-modal-description"
       >
-        {/* <Box sx={{ position: 'absolute' as 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          bgcolor: 'background.paper',
-          border: '2px solid #000',
-          boxShadow: 24,
-          p: 4, }}>
-          {imagePath}
-        </Box> */}
-        <img src={imagePath} alt=''/>
+        {isImage ? (<Box sx={{ position: 'absolute' as 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
+            border: '2px solid #000',
+            boxShadow: 24,
+            p: 4, }}>
+              <img src={itemPath} alt=''/>
+          </Box>
+          ) : (
+          <Box sx={{ position: 'absolute' as 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
+            border: '2px solid #000',
+            boxShadow: 24,
+            width: '75%',
+            p: 4, }}>
+              <h2>Document Processing</h2>
+            {textContent}
+          </Box>)
+        }
       </Modal>
   </>
   );
