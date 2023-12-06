@@ -5,7 +5,6 @@ function SampleTest(){
     const getData = async()=>{
         const reqData = {userName:'test', detectPrivacy:true, sendTimeFrom:'20231120000000', sendTimeTo:'20231121000000'}
         const response = await apiGetAuditJobLog(reqData);
-        console.log(response);
     
        }
     useEffect(()=>{

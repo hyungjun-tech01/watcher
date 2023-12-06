@@ -7,8 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { atomsAuditJobLogData, IAuditJobLog, IAuditJobLogQueryCondi } from '../../atoms/atomsAuditJobLog';
 import { AuditRepository } from '../../repository/auditRepository';
 import { useRecoilValue } from 'recoil';
-import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
-import { ReactComponent as NoImage } from '../../image/noun-no-image.svg';
 
 interface IAuditLogTable {
   userName: string | null,
@@ -84,7 +82,6 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
       })
     }
     catch(error) {
-      console.log('Fail to get Text from file in server');
       setTextContent("");
     }
   }, [handleOpen]);
@@ -92,8 +89,6 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
   const renderImageCell =  useCallback((props: GridRenderCellParams<any, string>) => {
     const { value } = props;
 
-    console.log('linkImage', value);
-    
     if(value && value !=="") {
       const found_idx = value.lastIndexOf('.');
       if(found_idx !== -1){
@@ -104,23 +99,23 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
         return (
           <div style={{alignItems:'center', textAlign: 'center', cursor:'pointer'}} onClick={()=>{
             if(isThisPdf) {
-              console.log('Open pdf !!!');
               window.open(value);
             } else {
-              console.log('Show image !!!');
               setIsImage(true);
               setItemPath(value);
               handleOpen();
             }}}
           >
-            <img width="94px" height="94px" src={replace_thumbnail_src} alt='' />
+            <img width="94px" height="94px" src={replace_thumbnail_src} alt='No Image' />
           </div>
         );
       };
     }else{
+      return(
       <div>
-        <NoImage />
+        No Image
       </div>
+      );
     };
     return "";
   }, [handleOpen]);
@@ -154,7 +149,6 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
       return (
         <div style={{display:'block', cursor:'pointer'}} onClick={()=>{
             if(value.textPath && value.textPath !== "") {
-              console.log('Open text !!!');
               setIsImage(false);
               getTextInTextPath(value.textPath);
             }

@@ -21,7 +21,6 @@ export const AuditRepository = selector({
             }
         });
         const queryAuditJobLog = getCallback(({set}) => async (data:IAuditJobLogQueryCondi) => {
-            console.log('queryAuditJobLog is called');
             try{
                 const response = await fetch(`${BASE_PATH}/getauditjob`,{
                     method: "POST", 

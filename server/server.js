@@ -69,57 +69,23 @@ app.post('/upload', upload.single('file'),async (req, res) => {
     try {
     // 이미지 데이터를 바이너리로 변환하여 파일에 저장 (동기) -> 앞에 await를 붙히면 프로세스가 안 끝남.
         writeFileAsync(filePath, fileData, 'binary');
-        console.log('파일 저장 성공:', filePath); 
         res.json({fileName:fileName, filePath:filePath});
     } catch (err) {
         console.error(err);
         res.status(500).send('파일 업로드 중 오류가 발생했습니다.');
     }finally{
         res.end();
-        console.log('final:', filePath); 
     }
 });
 
-app.post('/deleteFile', async (req, res) => {
-    const {cardId, fileExt, fileName} = req.body;
-    // 이미지를 삭제할 경로 및 파일 이름
-    const filePath = `${ImageLog}/${cardId}/${fileName}`;
-    try {
-        // 파일이 존재하는지 확인
-         const fileStats = await fs.stat(filePath);
-        //const fileStats = await fs.promises.stat(filePath); 
-    
-        // 파일이 존재할 때만 삭제 수행
-        if (fileStats.isFile()) {
-            //  unlinkAsync(filePath);   // sync 밖에 안됨. 왜 안되는지 모르겠음 await넣으면 진행 안됨.
-            fsUpper.unlinkSync(filePath);
-            console.log('파일 삭제 성공:', filePath); 
-            res.json({fileName:fileName, filePath:filePath});
-        }else{
-            console.error(err);
-            console.log('파일 미존재 삭제 성공:', filePath); 
-            res.json({fileName:fileName, filePath:filePath});
-        }
-    } catch (err) {
-        console.error(err);
-        console.log('파일 미존재 삭제 성공:', filePath); 
-        res.json({fileName:fileName, filePath:filePath});
-      //  res.status(500).send('파일 삭제 중 오류가 발생했습니다.');
-    }finally{
-        res.end();
-        console.log('final:', filePath); 
-    }
-});
 
 // home  test
 app.get('/', (req, res)=>{
-    console.log("test....");
     res.send("Service is started");
 });
 
 //login
 app.post('/login', async(req, res) => {
-    console.log('login');
     const {email, password} = req.body;
     try{
         const users = await pool.query('SELECT * FROM user_account WHERE email = $1', [email]);
@@ -128,10 +94,8 @@ app.post('/login', async(req, res) => {
         const success = await bcrypt.compare(password, users.rows[0].password);
         const token = jwt.sign({email}, 'secret', {expiresIn:'1hr'});
         if(success){
-            console.log("success");
             res.json({'userId' : users.rows[0].id,'userName' : users.rows[0].username, token});
         }else{
-            console.log("fail");
             res.json({message:"Invalid email or password"});
         }
         res.end();
