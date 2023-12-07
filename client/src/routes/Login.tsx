@@ -102,8 +102,6 @@ const Login = () => {
 
   const onMessageDismiss = () => {
     setLoginError(initErrorContent);
-    console.log('loginError',loginError);
-    
   };
   const onValid = async (data: any) => {
     setIsSubmitting(true);
