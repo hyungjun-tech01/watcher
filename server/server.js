@@ -88,13 +88,20 @@ app.get('/', (req, res)=>{
 app.post('/login', async(req, res) => {
     const {email, password} = req.body;
     try{
-        const users = await pool.query('SELECT * FROM user_account WHERE email = $1', [email]);
-        if(!users.rows.length) return res.json({message:'Invalid email or password'});
+        //const users = await pool.query('SELECT * FROM user_account WHERE email = $1', [email]);
+        //if(!users.rows.length) return res.json({message:'Invalid email or password'});
+        const adminUserId = 'admin';
+        const adminPassword = '$2b$10$smDUBTdRbt6bnzwIcQkoX.MJgaD21lIxoT9AgE1zW2/EYUROUDlnG';
 
-        const success = await bcrypt.compare(password, users.rows[0].password);
+        if (adminUserId !== email ){
+            res.json({message:"Invalid email or password"});
+            return;
+        }
+
+        const success = await bcrypt.compare(password, adminPassword);
         const token = jwt.sign({email}, 'secret', {expiresIn:'1hr'});
         if(success){
-            res.json({'userId' : users.rows[0].id,'userName' : users.rows[0].username, token});
+            res.json({'userId' : 'admin','userName' : 'adiministrator', token});
         }else{
             res.json({message:"Invalid email or password"});
         }
