@@ -133,7 +133,8 @@ app.get('/getAllAuditJob', async(req, res) => {
             image_archive_path as "imageArchivePath",
             text_archive_path as "textArchivePath",
             origina_job_id   as "originaJobId" 
-            from tbl_audit_job_log`);
+            from tbl_audit_job_log
+            order by send_time desc`);
         res.json(auditJob.rows);
         res.end();
     }catch(err){
@@ -175,7 +176,8 @@ app.post('/getauditjob', async(req, res) => {
             where user_name like '%'||$1||'%'
                 and detect_privacy = COALESCE($2, detect_privacy)
                 and send_time >= $3
-                and send_time <= $4`,
+                and send_time <= $4
+            order by send_time desc`,
             [userName, transferDetectprivacy, sendTimeFrom, sendTimeTo, MYHOST]
         ) ;
         // : await pool.query(` 
