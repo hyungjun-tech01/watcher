@@ -132,9 +132,8 @@ app.get('/getAllAuditJob', async(req, res) => {
             privacy_text as "privacyText",
             image_archive_path as "imageArchivePath",
             text_archive_path as "textArchivePath",
-            origina_job_id   as "originaJobId" 
-            from tbl_audit_job_log
-            order by send_time desc`);
+            original_job_id   as "originaJobId" 
+            from tbl_audit_job_log`);
         res.json(auditJob.rows);
         res.end();
     }catch(err){
@@ -170,7 +169,7 @@ app.post('/getauditjob', async(req, res) => {
                 privacy_text as "privacyText",
                 image_archive_path,
                 text_archive_path,
-                origina_job_id   as "originaJobId",
+                original_job_id   as "originaJobId",
                 $5||'/ImageLog/'||image_archive_path as "imageArchivePath",
                 $5||'/TextLog/'||text_archive_path as "textArchivePath"
             from tbl_audit_job_log
