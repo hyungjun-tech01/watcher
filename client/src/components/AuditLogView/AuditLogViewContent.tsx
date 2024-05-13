@@ -63,6 +63,7 @@ function AuditLogViewContent() {
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [detect, setDetect] = useState<boolean>(true);
+  const [privacyText, setPrivacyText] = useState<string>('');
 
   const handleChangeDetect = useCallback((event: React.ChangeEvent) => {
     setDetect((prev) => !prev);
@@ -95,6 +96,13 @@ function AuditLogViewContent() {
       setUser(event.target.value);
     },
     [setUser]
+  );
+
+  const handlePrivacyText = useCallback(
+    (event: any) => {
+      setPrivacyText(event.target.value);
+    },
+    [setPrivacyText]
   );
 
   useEffect(() => {
@@ -137,17 +145,32 @@ function AuditLogViewContent() {
         </div>
         <div className={styles.searchStack}>
           <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
-            {t("common.users")}
+           
           </Typography>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder={t("common.search")}
+              placeholder= {t("common.users")}
               inputProps={{ "aria-label": "search" }}
               value={user}
               onChange={handleChangeUser}
+            />
+          </Search>
+        </div>
+        <div className={styles.searchStack}>
+          <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
+          </Typography>
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder={t("common.detect_result")}
+              inputProps={{ "aria-label": "search" }}
+              value={privacyText}
+              onChange={handlePrivacyText}
             />
           </Search>
         </div>
@@ -159,6 +182,7 @@ function AuditLogViewContent() {
           detectValue={detect}
           fromTime={getDateNumberForTable(startDate)}
           toTime={getDateNumberForTable(endDate)}
+          privacyText={privacyText}
         />
       </Paper>
     </div>
