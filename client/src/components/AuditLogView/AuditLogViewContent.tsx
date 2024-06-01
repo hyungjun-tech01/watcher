@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import { styled, alpha } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
+import Button from '@mui/material/Button';
 
 import Paper from "@mui/material/Paper";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -64,6 +65,7 @@ function AuditLogViewContent() {
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [detect, setDetect] = useState<boolean>(true);
   const [privacyText, setPrivacyText] = useState<string>('');
+  const [executeQuery, setExecuteQuery] = useState<boolean>(false);
 
   const handleChangeDetect = useCallback((event: React.ChangeEvent) => {
     setDetect((prev) => !prev);
@@ -104,6 +106,10 @@ function AuditLogViewContent() {
     },
     [setPrivacyText]
   );
+  const handleOnClick = (event:any)=>{
+    event.preventDefault();
+    setExecuteQuery(!executeQuery);
+  };
 
   useEffect(() => {
     const currentDate = new Date();
@@ -111,42 +117,40 @@ function AuditLogViewContent() {
     const weekAgo = new Date(currentDate);
     weekAgo.setDate(currentDate.getDate() - 7);
     setStartDate(weekAgo);
+    setExecuteQuery(!executeQuery);
   }, []);
   return (
     <div className={styles.content}>
-      <Toolbar sx={{ flexGrow: 1,  justifyContent: "space-around" }}>
-        <div className={styles.searchStack}>
+      <Toolbar sx={{height: 40, minHeight:40,   flexGrow: 1,  justifyContent: "space-around", 
+        '@media (min-width: 600px)': {
+          minHeight: 40, // This ensures the minHeight is 40px even for larger screens
+        },
+       }}>
+        <div className={styles.checkboxSearchStack}>
           <Checkbox {...label} checked={detect} onChange={handleChangeDetect} />
           <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
             {t("common.detectIDInfo")}
           </Typography>
         </div>
         <div className={styles.searchStack}>
-          <Typography variant="body2" component="div" sx={{ flexGrow: 1, lineHeight: 4.0 }}>
-            {t("common.from_1")}
-            <DatePicker
+             <DatePicker
               value={startDate}
+              label={'From'}
               onChange={(newValue) => handleChangeStartDate(newValue)}
-              sx={{ width: 180, height: 50 }}
-            />
-            {t("common.from_2")}
-          </Typography>
+              slotProps={{ textField: { size: 'small' } }}
+              sx={{ width: 180}}
+            /> 
         </div>
         <div className={styles.searchStack}>
-          <Typography variant="body2" component="div" sx={{ flexGrow: 1, lineHeight: 4.0 }}>
-            {t("common.to_1")}
-            <DatePicker
+               <DatePicker
               value={endDate}
+              label={'To'}
               onChange={(newValue) => handleChangeEndDate(newValue)}
-              sx={{ width: 180, height: 50 }}
+              slotProps={{ textField: { size: 'small' } }}
+              sx={{ width: 180 }}
             />
-            {t("common.to_2")}
-          </Typography>
         </div>
         <div className={styles.searchStack}>
-          <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
-           
-          </Typography>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -160,8 +164,6 @@ function AuditLogViewContent() {
           </Search>
         </div>
         <div className={styles.searchStack}>
-          <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
-          </Typography>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -174,6 +176,18 @@ function AuditLogViewContent() {
             />
           </Search>
         </div>
+        <div className={styles.checkboxSearchStack}>
+          <Button
+            type="submit"
+            variant="contained"
+            onClick={handleOnClick}
+            sx={{ mt: 3, mb: 2 , 
+                 backgroundColor:"rgba(25,137,43,255)",
+                ":hover": { backgroundColor: "rgba(13,118,33,255)" }
+                }}
+          >조회
+          </Button>
+        </div>
       </Toolbar>
 
       <Paper elevation={3} sx={{ m: 2  }}>
@@ -183,6 +197,7 @@ function AuditLogViewContent() {
           fromTime={getDateNumberForTable(startDate)}
           toTime={getDateNumberForTable(endDate)}
           privacyText={privacyText}
+          executeQuery={executeQuery}
         />
       </Paper>
     </div>

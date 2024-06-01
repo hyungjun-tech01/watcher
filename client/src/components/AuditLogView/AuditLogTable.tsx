@@ -14,6 +14,7 @@ interface IAuditLogTable {
   fromTime: number,
   toTime: number,
   privacyText: string | null,
+  executeQuery : boolean,
 };
 interface IAuditLogRowData {
   jobLogId: number,
@@ -27,9 +28,10 @@ interface IAuditLogRowData {
   originalPages: number,
   detectPrivacy: boolean,
   privacyText: string,
+
 };
 
-const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText}: IAuditLogTable) => {
+const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, executeQuery}: IAuditLogTable) => {
   const [t] = useTranslation();
   const { queryAuditJobLog } = useRecoilValue(AuditRepository);
   const auditLogData = useRecoilValue(atomsAuditJobLogData);
@@ -52,7 +54,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText}: I
       privacyText : privacyText ? privacyText :'',
     };
     queryAuditJobLog(queryInput);
-  }, [detectValue, fromTime, queryAuditJobLog, toTime, userName, privacyText]);
+  }, [executeQuery]);
 
   const setTableWithLogData = useCallback((logData:IAuditJobLog[])=> {
     const updatedRowData: IAuditLogRowData[] = logData.map((data:IAuditJobLog) => (
@@ -199,7 +201,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText}: I
   useEffect(() =>{
     // loadAllAuditJobLog();
     queryLogData();
-  }, [userName, detectValue, toTime, fromTime, privacyText, queryLogData]);
+  }, [executeQuery, queryLogData]);
 
   useEffect(()=> {
     setTableWithLogData(auditLogData);
