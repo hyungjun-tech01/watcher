@@ -14,7 +14,7 @@ const core = {
   translation: {
     common: {
       destination: '전송처',
-      detectIDInfo: '개인정보 검출',      
+      detectIDInfo: '검출 여부',      
       printingDevice: '출력장비',
       productName: 'Watcher Web',
       copies: '부수',

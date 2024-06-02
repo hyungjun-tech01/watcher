@@ -52,7 +52,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     [theme.breakpoints.up("sm")]: {
       width: "12ch",
       "&:focus": {
-        width: "20ch",
+        width: "12ch",
       },
     },
   },
@@ -126,12 +126,7 @@ function AuditLogViewContent() {
           minHeight: 40, // This ensures the minHeight is 40px even for larger screens
         },
        }}>
-        <div className={styles.checkboxSearchStack}>
-          <Checkbox {...label} checked={detect} onChange={handleChangeDetect} />
-          <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
-            {t("common.detectIDInfo")}
-          </Typography>
-        </div>
+
         <div className={styles.searchStack}>
              <DatePicker
               value={startDate}
@@ -149,6 +144,12 @@ function AuditLogViewContent() {
               slotProps={{ textField: { size: 'small' } }}
               sx={{ width: 180 }}
             />
+        </div>
+        <div className={styles.checkboxSearchStack}>
+          <Checkbox {...label} checked={detect} onChange={handleChangeDetect} />
+          <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
+            {t("common.detectIDInfo")}
+          </Typography>
         </div>
         <div className={styles.searchStack}>
           <Search>
