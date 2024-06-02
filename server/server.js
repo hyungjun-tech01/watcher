@@ -283,6 +283,23 @@ app.post('/getauditjob', async(req, res) => {
     }
 });
 
+// query personal into regExpression
+app.get('/getPersonalRegEx', async(req, res) => {
+    try{
+        const personalRegEx = await pool.query(` 
+            select id as "regExId",
+            regex_name as "RegexName",
+            regex_value as "RegexValue"
+            from tbl_personal_info_regex`);
+        res.json(personalRegEx.rows);
+        res.end();
+    }catch(err){
+        console.log(err);
+        res.json({message:err});        
+        res.end();
+    }
+});
+
 //signup 계정 생성 
 app.post('/signup', async(req, res) => {
     const {createrId , 
