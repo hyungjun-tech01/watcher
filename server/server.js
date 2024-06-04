@@ -50,6 +50,10 @@ app.set('etag', false);
 // 정적요청에 대한 응답을 보낼때 etag 생성을 하지 않도록
 const options = { etag : false };
 
+//값이 없으면 null로 세팅
+const defaultNull = (value) => value === undefined ? null : value;
+
+
 app.post('/upload', upload.single('file'),async (req, res) => {
     const cardId = req.body.cardId;
     const file_ext = req.body.fileExt;
@@ -283,7 +287,7 @@ app.post('/getauditjob', async(req, res) => {
     }
 });
 
-// query personal into regExpression
+// query personal info regExpression
 app.get('/getPersonalRegEx', async(req, res) => {
     try{
         const personalRegEx = await pool.query(` 
@@ -297,6 +301,41 @@ app.get('/getPersonalRegEx', async(req, res) => {
         console.log(err);
         res.json({message:err});        
         res.end();
+    }
+});
+
+// add/update/delete personal info regExpression
+app.post('/modifyPersonalRegEx', async(req,res) => {
+    const { 
+          actionType, 
+          regexName,
+          regexValue,
+          modifyUser } = req.body;
+    
+    try{
+        if(actionType === 'ADD'){
+
+        }else if(actionType === 'UPDATE'){
+
+        }else if(actionType === 'DELETE'){
+
+        }
+        
+        const out_regexName = regexName;
+        const out_create_user = actionType === 'ADD' ? modifyUser : "";
+        const out_create_date = actionType === 'ADD' ? currentDate.currdate : "";
+        const out_modify_date = currentDate.currdate;
+        const out_recent_user = modifyUser;
+        
+        res.json({ out_regexName: out_regexName,  out_create_user:out_create_user, 
+           out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user }); // 결과 리턴을 해 줌 .  
+   
+        console.log({ out_regexName: out_regexName,  out_create_user:out_create_user, 
+               out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user });
+    }catch(err){
+        console.error(err);
+        res.json({message:err.message});
+        res.end();              
     }
 });
 
