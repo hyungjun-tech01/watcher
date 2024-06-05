@@ -37,6 +37,8 @@ export const AuditRepository = selector({
                 console.error(err);
             }
         });
+
+        
         return {
             loadAllAuditJobLog,
             queryAuditJobLog

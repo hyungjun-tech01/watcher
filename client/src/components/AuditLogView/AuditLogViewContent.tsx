@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import { styled, alpha } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
+import Button from '@mui/material/Button';
 
 import Paper from "@mui/material/Paper";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -51,7 +52,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     [theme.breakpoints.up("sm")]: {
       width: "12ch",
       "&:focus": {
-        width: "20ch",
+        width: "12ch",
       },
     },
   },
@@ -63,6 +64,8 @@ function AuditLogViewContent() {
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [detect, setDetect] = useState<boolean>(true);
+  const [privacyText, setPrivacyText] = useState<string>('');
+  const [executeQuery, setExecuteQuery] = useState<boolean>(false);
 
   const handleChangeDetect = useCallback((event: React.ChangeEvent) => {
     setDetect((prev) => !prev);
@@ -97,59 +100,94 @@ function AuditLogViewContent() {
     [setUser]
   );
 
+  const handlePrivacyText = useCallback(
+    (event: any) => {
+      setPrivacyText(event.target.value);
+    },
+    [setPrivacyText]
+  );
+  const handleOnClick = (event:any)=>{
+    event.preventDefault();
+    setExecuteQuery(!executeQuery);
+  };
+
   useEffect(() => {
     const currentDate = new Date();
     setEndDate(currentDate);
     const weekAgo = new Date(currentDate);
     weekAgo.setDate(currentDate.getDate() - 7);
     setStartDate(weekAgo);
+    setExecuteQuery(!executeQuery);
   }, []);
   return (
     <div className={styles.content}>
-      <Toolbar sx={{ flexGrow: 1,  justifyContent: "space-around" }}>
+      <Toolbar sx={{height: 40, minHeight:40,   flexGrow: 1,  justifyContent: "space-around", 
+        '@media (min-width: 600px)': {
+          minHeight: 40, // This ensures the minHeight is 40px even for larger screens
+        },
+       }}>
+
         <div className={styles.searchStack}>
+             <DatePicker
+              value={startDate}
+              label={'From'}
+              onChange={(newValue) => handleChangeStartDate(newValue)}
+              slotProps={{ textField: { size: 'small' } }}
+              sx={{ width: 180}}
+            /> 
+        </div>
+        <div className={styles.searchStack}>
+               <DatePicker
+              value={endDate}
+              label={'To'}
+              onChange={(newValue) => handleChangeEndDate(newValue)}
+              slotProps={{ textField: { size: 'small' } }}
+              sx={{ width: 180 }}
+            />
+        </div>
+        <div className={styles.checkboxSearchStack}>
           <Checkbox {...label} checked={detect} onChange={handleChangeDetect} />
           <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
             {t("common.detectIDInfo")}
           </Typography>
         </div>
         <div className={styles.searchStack}>
-          <Typography variant="body2" component="div" sx={{ flexGrow: 1, lineHeight: 4.0 }}>
-            {t("common.from_1")}
-            <DatePicker
-              value={startDate}
-              onChange={(newValue) => handleChangeStartDate(newValue)}
-              sx={{ width: 180, height: 50 }}
-            />
-            {t("common.from_2")}
-          </Typography>
-        </div>
-        <div className={styles.searchStack}>
-          <Typography variant="body2" component="div" sx={{ flexGrow: 1, lineHeight: 4.0 }}>
-            {t("common.to_1")}
-            <DatePicker
-              value={endDate}
-              onChange={(newValue) => handleChangeEndDate(newValue)}
-              sx={{ width: 180, height: 50 }}
-            />
-            {t("common.to_2")}
-          </Typography>
-        </div>
-        <div className={styles.searchStack}>
-          <Typography variant="body2" component="div" sx={{ flexGrow: 1 }}>
-            {t("common.users")}
-          </Typography>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder={t("common.search")}
+              placeholder= {t("common.users")}
               inputProps={{ "aria-label": "search" }}
               value={user}
               onChange={handleChangeUser}
             />
           </Search>
+        </div>
+        <div className={styles.searchStack}>
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder={t("common.detect_result")}
+              inputProps={{ "aria-label": "search" }}
+              value={privacyText}
+              onChange={handlePrivacyText}
+            />
+          </Search>
+        </div>
+        <div className={styles.checkboxSearchStack}>
+          <Button
+            type="submit"
+            variant="contained"
+            onClick={handleOnClick}
+            sx={{ mt: 3, mb: 2 , 
+                 backgroundColor:"rgba(25,137,43,255)",
+                ":hover": { backgroundColor: "rgba(13,118,33,255)" }
+                }}
+          >조회
+          </Button>
         </div>
       </Toolbar>
 
@@ -159,6 +197,8 @@ function AuditLogViewContent() {
           detectValue={detect}
           fromTime={getDateNumberForTable(startDate)}
           toTime={getDateNumberForTable(endDate)}
+          privacyText={privacyText}
+          executeQuery={executeQuery}
         />
       </Paper>
     </div>

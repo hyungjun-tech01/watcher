@@ -24,9 +24,11 @@ export interface IAuditJobLogQueryCondi{
     detectPrivacy : boolean; 
     sendTimeFrom : string;
     sendTimeTo : string;
+    privacyText : string; 
 }
 
 export const atomsAuditJobLogData = atom<IAuditJobLog[]>({
   key: 'auditJobLogData',
   default: []
 })
+

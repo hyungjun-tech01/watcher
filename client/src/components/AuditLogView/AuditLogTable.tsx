@@ -7,12 +7,16 @@ import { useTranslation } from 'react-i18next';
 import { atomsAuditJobLogData, IAuditJobLog, IAuditJobLogQueryCondi } from '../../atoms/atomsAuditJobLog';
 import { AuditRepository } from '../../repository/auditRepository';
 import { useRecoilValue } from 'recoil';
+import Button from '@mui/material/Button';
+import AuditLogPdfViewer from './AuditLogPdfViewer';
 
 interface IAuditLogTable {
   userName: string | null,
   detectValue: boolean,
   fromTime: number,
   toTime: number,
+  privacyText: string | null,
+  executeQuery : boolean,
 };
 interface IAuditLogRowData {
   jobLogId: number,
@@ -26,9 +30,10 @@ interface IAuditLogRowData {
   originalPages: number,
   detectPrivacy: boolean,
   privacyText: string,
+
 };
 
-const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable) => {
+const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, executeQuery}: IAuditLogTable) => {
   const [t] = useTranslation();
   const { queryAuditJobLog } = useRecoilValue(AuditRepository);
   const auditLogData = useRecoilValue(atomsAuditJobLogData);
@@ -40,6 +45,14 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
   const [isImage, setIsImage] = useState(false);
   const [textContent, setTextContent] = useState<string>("");
 
+  // Pdf 모달 
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+  const [pdfUrl, setpdfUrl] = useState("");
+  const openPdfModal = useCallback((value:any) => {
+    setpdfUrl(value);
+    setIsPdfModalOpen(true)}, []);
+  const closePdfModal = useCallback(() => setIsPdfModalOpen(false), []);
+  
   const queryLogData = useCallback(()=>{
     if(fromTime >= toTime) return;
     
@@ -48,9 +61,10 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
       detectPrivacy : detectValue,
       sendTimeFrom : fromTime.toString(),
       sendTimeTo : toTime.toString(),
+      privacyText : privacyText ? privacyText :'',
     };
     queryAuditJobLog(queryInput);
-  }, [detectValue, fromTime, queryAuditJobLog, toTime, userName]);
+  }, [executeQuery]);
 
   const setTableWithLogData = useCallback((logData:IAuditJobLog[])=> {
     const updatedRowData: IAuditLogRowData[] = logData.map((data:IAuditJobLog) => (
@@ -92,14 +106,16 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
     if(value && value !=="") {
       const found_idx = value.lastIndexOf('.');
       if(found_idx !== -1){
-        const thumbnail_src = value?.slice(0, found_idx) + '_thumbnail.png';
+        //const thumbnail_src = value?.slice(0, found_idx) + '_thumbnail.png';
+        const thumbnail_src = value + '_thumbnail.png';  // hjkim add 2024.05.02
         const replace_thumbnail_src = thumbnail_src.replace(/\\/g,'/');
         const fileExt = value.slice(found_idx + 1).toLowerCase();
         const isThisPdf = fileExt === 'pdf';
         return (
           <div style={{alignItems:'center', textAlign: 'center', cursor:'pointer'}} onClick={()=>{
             if(isThisPdf) {
-              window.open(value);
+              openPdfModal(value);
+              //window.open(value);
             } else {
               setIsImage(true);
               setItemPath(value);
@@ -196,7 +212,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
   useEffect(() =>{
     // loadAllAuditJobLog();
     queryLogData();
-  }, [userName, detectValue, toTime, fromTime, queryLogData]);
+  }, [executeQuery, queryLogData]);
 
   useEffect(()=> {
     setTableWithLogData(auditLogData);
@@ -222,7 +238,8 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
             sx={{ fontSize: 12 }}
         />
       </Box>
-      <Modal
+
+       <Modal
         open={open}
         onClose={handleClose}
         aria-labelledby="parent-modal-title"
@@ -250,17 +267,24 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
             p: 4, }}>
               <h2>Document Processing</h2>
             {textContent&&(
-              <pre>
+              <pre style={{ maxHeight: '250px', overflowY: 'auto', userSelect: 'none' }}>
                 {
                   // 개행문자를 기준으로 문자를 잘라(split) 배열로 만들고 
                   //배열 사이사이 <br />태그를 넣어 뿌려줘서 개행을 넣은 효과를 내준다.
-                  textContent.split("\\n").map((line) => {
-                  return (
-                      <span>
-                          {line}
-                          <br />
-                      </span>
-                  );
+                  textContent.split("\n").map((line) => {
+                    if( line.length <= 1){
+                        return (
+                              ''
+                      );
+                    }else{
+                      return (
+                          <span>
+                              {line}
+                              <br />
+                          </span>
+                      );
+                  }
+
                   })
                 }
               </pre>
@@ -268,6 +292,36 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime}: IAuditLogTable
           </Box>)
         }
       </Modal>
+
+      <Modal
+        open={isPdfModalOpen}
+        onClose={closePdfModal}
+        style={{ width: '800px',
+            height: '85vh',
+            backgroundColor: '#ffffff',
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            border: '5px solid #000' }}
+        >
+        <>
+          <AuditLogPdfViewer pdfUrl={pdfUrl} onClose={()=>closePdfModal}/>
+          <div style={{ textAlign: 'right' }}>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={closePdfModal}
+              sx={{ mt: 3, mb: 2 , 
+                  backgroundColor:"rgba(25,137,43,255)",
+                  ":hover": { backgroundColor: "rgba(13,118,33,255)" }
+                  }}
+            >닫기
+            </Button>
+          </div>
+        </>
+      </Modal>
+
   </>
   );
 };

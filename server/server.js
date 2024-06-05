@@ -50,6 +50,10 @@ app.set('etag', false);
 // 정적요청에 대한 응답을 보낼때 etag 생성을 하지 않도록
 const options = { etag : false };
 
+//값이 없으면 null로 세팅
+const defaultNull = (value) => value === undefined ? null : value;
+
+
 app.post('/upload', upload.single('file'),async (req, res) => {
     const cardId = req.body.cardId;
     const file_ext = req.body.fileExt;
@@ -148,18 +152,53 @@ app.post('/getauditjob', async(req, res) => {
     const { userName, 
         detectPrivacy,
         sendTimeFrom,
-        sendTimeTo } = req.body;
+        sendTimeTo,
+        privacyText } = req.body;
     const transferDetectprivacy = detectPrivacy? true:null;    
-    console.log('Input Value : ', userName, detectPrivacy, sendTimeFrom, sendTimeTo);
+
+    const isPrivacyText = privacyText? true:false;
+    console.log('getauditjob Input Value : ', userName, detectPrivacy, sendTimeFrom, sendTimeTo, privacyText);
     try{
-        const auditJob = await pool.query(` 
+        if ( detectPrivacy === true &&  isPrivacyText === true){
+            const auditJob = await pool.query(` 
+                select job_log_id as "jobLogId",
+                    job_type as "jobType",
+                    printer_serial_number as "printerSerialNumber",
+                    job_id   as "jobId"   ,
+                    user_name as "userName",
+                    destination as "destination",
+                    send_time as "sendTime",
+                    file_name as "fileName",
+                    finish_time  as "finishTime",
+                    copies as "copies" ,
+                    original_pages as "originalPages",
+                    detect_privacy  as "detectPrivacy",
+                    privacy_text as "privacyText",
+                    image_archive_path,
+                    text_archive_path,
+                    original_job_id   as "originaJobId",
+                    $5||'/ImageLog/'||image_archive_path as "imageArchivePath",
+                    $5||'/TextLog/'||text_archive_path as "textArchivePath"
+                from tbl_audit_job_log
+                where user_name like '%'||$1||'%' 
+                  and send_time >= $2
+                  and send_time <= $3
+                  and detect_privacy = $4
+                  and privacy_text like '%'||$6||'%' 
+                order by send_time desc`,
+                [userName, sendTimeFrom, sendTimeTo,detectPrivacy, MYHOST, privacyText]
+            ) ;
+            res.json(auditJob.rows);
+            res.end();
+        }else if ( detectPrivacy === true &&  isPrivacyText === false){
+            const auditJob = await pool.query(` 
             select job_log_id as "jobLogId",
                 job_type as "jobType",
                 printer_serial_number as "printerSerialNumber",
                 job_id   as "jobId"   ,
                 user_name as "userName",
                 destination as "destination",
-                c as "sendTime",
+                send_time as "sendTime",
                 file_name as "fileName",
                 finish_time  as "finishTime",
                 copies as "copies" ,
@@ -172,42 +211,131 @@ app.post('/getauditjob', async(req, res) => {
                 $5||'/ImageLog/'||image_archive_path as "imageArchivePath",
                 $5||'/TextLog/'||text_archive_path as "textArchivePath"
             from tbl_audit_job_log
-            where user_name like '%'||$1||'%'
-                and detect_privacy = COALESCE($2, detect_privacy)
-                and send_time >= $3
-                and send_time <= $4
-                order by send_time desc`,
-            [userName, transferDetectprivacy, sendTimeFrom, sendTimeTo, MYHOST]
-        ) ;
-        // : await pool.query(` 
-        //     select job_log_id as "jobLogId",
-        //     job_type as "jobType",
-        //     printer_serial_number as "printerSerialNumber",
-        //     job_id   as "jobId"   ,
-        //     user_name as "userName",
-        //     destination as "destination",
-        //     send_time as "sendTime",
-        //     file_name as "fileName",
-        //     finish_time  as "finishTime",
-        //     copies as "copies" ,
-        //     original_pages as "originalPages",
-        //     detect_privacy  as "detectPrivacy",
-        //     privacy_text as "privacyText",
-        //     image_archive_path as "imageArchivePath",
-        //     text_archive_path as "textArchivePath",
-        //     origina_job_id   as "originaJobId" 
-        //     from tbl_audit_job_log
-        //     where detect_privacy = $1
-        //         and send_time >= $2
-        //         and send_time <= $3`,
-        //     [detectPrivacy, sendTimeFrom, sendTimeTo]
-        // );
-        res.json(auditJob.rows);
+            where user_name like '%'||$1||'%' 
+              and send_time >= $2
+              and send_time <= $3
+              and detect_privacy = $4
+            order by send_time desc`,
+            [userName, sendTimeFrom, sendTimeTo,detectPrivacy, MYHOST]
+            ) ;
+            res.json(auditJob.rows);
+            res.end();
+        }else if ( detectPrivacy === false &&  isPrivacyText === true){
+            const auditJob = await pool.query(` 
+            select job_log_id as "jobLogId",
+                job_type as "jobType",
+                printer_serial_number as "printerSerialNumber",
+                job_id   as "jobId"   ,
+                user_name as "userName",
+                destination as "destination",
+                send_time as "sendTime",
+                file_name as "fileName",
+                finish_time  as "finishTime",
+                copies as "copies" ,
+                original_pages as "originalPages",
+                detect_privacy  as "detectPrivacy",
+                privacy_text as "privacyText",
+                image_archive_path,
+                text_archive_path,
+                original_job_id   as "originaJobId",
+                $4||'/ImageLog/'||image_archive_path as "imageArchivePath",
+                $4||'/TextLog/'||text_archive_path as "textArchivePath"
+            from tbl_audit_job_log
+            where user_name like '%'||$1||'%' 
+              and send_time >= $2
+              and send_time <= $3
+              and privacy_text like '%'||$5||'%' 
+            order by send_time desc`,   
+            [userName, sendTimeFrom, sendTimeTo, MYHOST, privacyText]
+            );
+            res.json(auditJob.rows);
+            res.end();           
+        }else{
+            const auditJob = await pool.query(` 
+            select job_log_id as "jobLogId",
+                job_type as "jobType",
+                printer_serial_number as "printerSerialNumber",
+                job_id   as "jobId"   ,
+                user_name as "userName",
+                destination as "destination",
+                send_time as "sendTime",
+                file_name as "fileName",
+                finish_time  as "finishTime",
+                copies as "copies" ,
+                original_pages as "originalPages",
+                detect_privacy  as "detectPrivacy",
+                privacy_text as "privacyText",
+                image_archive_path,
+                text_archive_path,
+                original_job_id   as "originaJobId",
+                $4||'/ImageLog/'||image_archive_path as "imageArchivePath",
+                $4||'/TextLog/'||text_archive_path as "textArchivePath"
+            from tbl_audit_job_log
+            where user_name like '%'||$1||'%' 
+              and send_time >= $2
+              and send_time <= $3
+            order by send_time desc`,
+            [userName, sendTimeFrom, sendTimeTo, MYHOST]
+            );
+            res.json(auditJob.rows);
+            res.end();   
+        }
+    }catch(err){
+        console.log(err);
+        res.json({message:err});        
+        res.end();
+    }
+});
+
+// query personal info regExpression
+app.get('/getPersonalRegEx', async(req, res) => {
+    try{
+        const personalRegEx = await pool.query(` 
+            select id as "regExId",
+            regex_name as "RegexName",
+            regex_value as "RegexValue"
+            from tbl_personal_info_regex`);
+        res.json(personalRegEx.rows);
         res.end();
     }catch(err){
         console.log(err);
         res.json({message:err});        
         res.end();
+    }
+});
+
+// add/update/delete personal info regExpression
+app.post('/modifyPersonalRegEx', async(req,res) => {
+    const { 
+          actionType, 
+          regexName,
+          regexValue,
+          modifyUser } = req.body;
+    
+    try{
+        if(actionType === 'ADD'){
+
+        }else if(actionType === 'UPDATE'){
+
+        }else if(actionType === 'DELETE'){
+
+        }
+        
+        const out_regexName = regexName;
+        const out_create_user = actionType === 'ADD' ? modifyUser : "";
+        const out_create_date = actionType === 'ADD' ? currentDate.currdate : "";
+        const out_modify_date = currentDate.currdate;
+        const out_recent_user = modifyUser;
+        
+        res.json({ out_regexName: out_regexName,  out_create_user:out_create_user, 
+           out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user }); // 결과 리턴을 해 줌 .  
+   
+        console.log({ out_regexName: out_regexName,  out_create_user:out_create_user, 
+               out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user });
+    }catch(err){
+        console.error(err);
+        res.json({message:err.message});
+        res.end();              
     }
 });
 

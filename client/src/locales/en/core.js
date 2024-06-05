@@ -75,7 +75,7 @@ const core = {
       detect_result: 'Result',
       detectAutomatically: 'Detect automatically',
       detected: 'Detected',
-      detectIDInfo: 'Detect ID information',
+      detectIDInfo: 'Is Detect',
       dropFileToUpload: 'Drop file to upload',
       editor: 'Editor',
       editAttachment_title: 'Edit Attachment',
