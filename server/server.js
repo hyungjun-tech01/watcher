@@ -159,7 +159,7 @@ app.post('/getauditjob', async(req, res) => {
                 job_id   as "jobId"   ,
                 user_name as "userName",
                 destination as "destination",
-                send_time as "sendTime",
+                c as "sendTime",
                 file_name as "fileName",
                 finish_time  as "finishTime",
                 copies as "copies" ,
@@ -175,7 +175,8 @@ app.post('/getauditjob', async(req, res) => {
             where user_name like '%'||$1||'%'
                 and detect_privacy = COALESCE($2, detect_privacy)
                 and send_time >= $3
-                and send_time <= $4`,
+                and send_time <= $4
+                order by send_time desc`,
             [userName, transferDetectprivacy, sendTimeFrom, sendTimeTo, MYHOST]
         ) ;
         // : await pool.query(` 
