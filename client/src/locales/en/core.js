@@ -179,6 +179,10 @@ const core = {
       viewer: 'Viewer',
       writeComment: 'Write a comment...',
       workTime: 'Work Time',
+      regex_name:'Reg Expression Name',
+      regex_value:'Reg Expression value',    
+      modify_user:'Recently User' ,
+      regex_modify:'Reg Expression Modify',
     },
 
     action: {
@@ -253,6 +257,11 @@ const core = {
       uploadNewAvatar: 'Upload new avatar',
       uploadNewImage: 'Upload new image',
     },
+    menu:{
+      auditlogview:'Audit Log',
+      home:'Home',
+      regex:'Regular Expression'
+    }
   },
 };
 

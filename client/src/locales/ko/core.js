@@ -28,7 +28,11 @@ const core = {
       from_1: '',
       from_2: '부터',
       to_1: '',
-      to_2: '까지',             
+      to_2: '까지',   
+      regex_name:'정규식 이름',
+      regex_value:'정규식 값',         
+      modify_user:'최근 수정자' ,
+      regex_modify:'정규식 수정',
     },
     action:{
       Login: '로그인',
@@ -36,7 +40,7 @@ const core = {
     menu:{
       auditlogview:'Audit Log',
       home:'Home',
-      
+      regex:'정규식',
     }
   },
 };

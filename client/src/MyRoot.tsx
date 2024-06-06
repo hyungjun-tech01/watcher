@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route }  from "react-router-dom";
 
 import Core from './routes/Core';
 import AuditLogView from './routes/AuditLogView';
+import RegExView from './routes/RegExView';
 import Login from './routes/Login';
 import SampleTest from './routes/SampleTest';
 import Path from './constants/Paths';
@@ -15,6 +16,7 @@ const MyRoot = () => {
       <Routes>
         <Route path = {Path.LOGIN} element={<Login/>} />
         <Route path = {Path.AUDITLOGVIEW} element={<AuditLogView/>} />
+        <Route path = {`/regexview`} element={<RegExView/>} />
         <Route path = {Path.SAMPLE} element={<SampleTest/>} />
         <Route path = {Path.ROOT} element={<AuditLogView/>} />
       </Routes>

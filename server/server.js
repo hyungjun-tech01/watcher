@@ -157,7 +157,10 @@ app.post('/getauditjob', async(req, res) => {
     const transferDetectprivacy = detectPrivacy? true:null;    
 
     const isPrivacyText = privacyText? true:false;
-    console.log('getauditjob Input Value : ', userName, detectPrivacy, sendTimeFrom, sendTimeTo, privacyText);
+    const v_sendTimeFrom = sendTimeFrom.substr(0,6)+'000000';
+    const v_sendTimeTo = sendTimeTo.substr(0,6)+'235959';
+
+    console.log('getauditjob Input Value : ', userName, detectPrivacy, v_sendTimeFrom, v_sendTimeTo, privacyText);
     try{
         if ( detectPrivacy === true &&  isPrivacyText === true){
             const auditJob = await pool.query(` 
@@ -186,7 +189,7 @@ app.post('/getauditjob', async(req, res) => {
                   and detect_privacy = $4
                   and privacy_text like '%'||$6||'%' 
                 order by send_time desc`,
-                [userName, sendTimeFrom, sendTimeTo,detectPrivacy, MYHOST, privacyText]
+                [userName, v_sendTimeFrom, v_sendTimeTo,detectPrivacy, MYHOST, privacyText]
             ) ;
             res.json(auditJob.rows);
             res.end();
@@ -216,7 +219,7 @@ app.post('/getauditjob', async(req, res) => {
               and send_time <= $3
               and detect_privacy = $4
             order by send_time desc`,
-            [userName, sendTimeFrom, sendTimeTo,detectPrivacy, MYHOST]
+            [userName, v_sendTimeFrom, v_sendTimeTo,detectPrivacy, MYHOST]
             ) ;
             res.json(auditJob.rows);
             res.end();
@@ -246,7 +249,7 @@ app.post('/getauditjob', async(req, res) => {
               and send_time <= $3
               and privacy_text like '%'||$5||'%' 
             order by send_time desc`,   
-            [userName, sendTimeFrom, sendTimeTo, MYHOST, privacyText]
+            [userName, v_sendTimeFrom, v_sendTimeTo, MYHOST, privacyText]
             );
             res.json(auditJob.rows);
             res.end();           
@@ -275,7 +278,7 @@ app.post('/getauditjob', async(req, res) => {
               and send_time >= $2
               and send_time <= $3
             order by send_time desc`,
-            [userName, sendTimeFrom, sendTimeTo, MYHOST]
+            [userName, v_sendTimeFrom, v_sendTimeTo, MYHOST]
             );
             res.json(auditJob.rows);
             res.end();   
@@ -401,6 +404,7 @@ app.get(`/${ImageLog}/:year/:month/:fileName`, function(req, res) {
     const fileName = req.params.fileName;
     const filePath = path.join('ImageLog', year, month, fileName);
 
+
     if (fsUpper.existsSync(filePath)) {
         res.contentType("application/pdf");
         fsUpper.createReadStream(filePath).pipe(res);
@@ -426,6 +430,101 @@ app.get(`/${TextLog}/:year/:month/:fileName`, function(req, res) {
         console.log('File not found');
         res.send('File not found');
     };
+});
+
+
+// query personal info regex
+app.get('/getAllRegex', async(req, res) => {
+    try{
+        console.log('getAllRegex');
+        const auditJob = await pool.query(` 
+            select regex_name ,
+            regex_value ,
+            modify_user 
+            from tbl_personal_info_regex`);
+        res.json(auditJob.rows);
+        res.end();
+    }catch(err){
+        console.log(err);
+        res.json({message:err});        
+        res.end();
+    }
+});
+
+
+// modify personal info regex
+app.post('/modifyRegex', async(req, res) => {
+    const  { 
+        action_type                = defaultNull(req.body.action_type),
+        regex_name         = defaultNull(req.body.regex_name),
+        regex_value         = defaultNull(req.body.regex_value),
+        modify_user        = defaultNull(req.body.modify_user)
+    } = req.body;
+
+
+    try{
+        const current_date = await pool.query(`select to_char(now(),'YYYY.MM.DD HH24:MI:SS') currdate`);
+        const currentDate = current_date.rows[0];
+
+        if (action_type === 'ADD') {
+            const response = await pool.query(`insert into tbl_personal_info_regex(
+                regex_name  ,
+                regex_value  ,
+                create_user ,
+                creation_date,
+                modify_user , 
+                modify_date    )
+                values($1,$2,$3,$4::timestamp,$5,$6::timestamp)`,
+                [
+                    regex_name  ,
+                    regex_value ,
+                    modify_user ,
+                    currentDate.currdate,
+                    modify_user,
+                    currentDate.currdate
+                ]
+            );       
+        }
+        if (action_type === 'UPDATE') {
+            const response = await pool.query(`
+            update tbl_personal_info_regex 
+                set  regex_value  = COALESCE($1 , regex_value) ,
+                modify_user = COALESCE($2 , modify_user) ,
+                modify_date   = COALESCE($3 , modify_date) 
+            where regex_name = $4`,
+                [
+                    regex_value  ,
+                    modify_user ,
+                    currentDate.currdate,
+                    regex_name
+                ]
+            );       
+        }
+        if (action_type === 'DELETE') {
+            const response = await pool.query(`
+           delete from tbl_personal_info_regex 
+            where regex_name = $1`,
+                [
+                    regex_name
+                ]
+            );       
+        }
+
+        const out_create_user = action_type === 'ADD' ? modify_user : "";
+        const out_create_date = action_type === 'ADD' ? currentDate.currdate : "";
+        const out_modify_date = currentDate.currdate;
+        const out_recent_user = modify_user;
+        
+        res.json({ message:'success', out_product_class_code: out_product_class_code,  out_create_user:out_create_user, 
+           out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user }); // 결과 리턴을 해 줌 .  
+   
+        console.log({ out_create_user:out_create_user, 
+               out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user });
+    }catch(err){
+        console.error(err);
+        res.json({message:err.message});   
+        res.end();              
+    }
 });
 
 app.listen(PORT, ()=> {
