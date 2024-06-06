@@ -73,7 +73,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
         imageArchivePath: data.imageArchivePath,
         textArchivePath: data.textArchivePath,
         sendTime:data.sendTime,
-        userName: data.userName,
+        userName: data.userName,  
         destination: data.destination,
         printerSerialNumber: data.printerSerialNumber,
         copies: data.copies,
