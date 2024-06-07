@@ -183,6 +183,7 @@ const core = {
       regex_value:'Reg Expression value',    
       modify_user:'Recently User' ,
       regex_modify:'Reg Expression Modify',
+      regex_add:'Reg Expression Add',
     },
 
     action: {

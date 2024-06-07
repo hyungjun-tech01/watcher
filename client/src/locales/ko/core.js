@@ -33,6 +33,7 @@ const core = {
       regex_value:'정규식 값',         
       modify_user:'최근 수정자' ,
       regex_modify:'정규식 수정',
+      regex_add:'정규식 추가',
     },
     action:{
       Login: '로그인',

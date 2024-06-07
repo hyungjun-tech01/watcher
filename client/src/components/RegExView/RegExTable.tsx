@@ -8,24 +8,58 @@ import { atomsRegExData, IRegEx } from '../../atoms/atomsRegEx';
 import { RegexRepository } from '../../repository/regexRepository';
 import { useRecoilValue } from 'recoil';
 import Button from '@mui/material/Button';
+import {useCookies} from "react-cookie";
+
 
 
 interface IRegExTable {
     executeQuery : boolean,
+    setExecuteQuery : (a:boolean)=>void;
   };
 
-const RegExTable = ({executeQuery}: IRegExTable) => {
+const RegExTable = ({executeQuery, setExecuteQuery}: IRegExTable) => {
     const [t] = useTranslation();
-    const { loadAllRegex } = useRecoilValue(RegexRepository);
+    const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
+    const { loadAllRegex, modifyRegex } = useRecoilValue(RegexRepository);
     const regExData = useRecoilValue(atomsRegExData);
     const [rowData, setRowData] = useState<IRegEx[]>([]);
 
     const [selectedRow, setSelectedRow] = useState<IRegEx | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
-
-
+    const [value, setValue] = useState<string|undefined>(selectedRow?.regex_value);
 
     const handleModalClose = useCallback(()=>{
+        setModalOpen(false);
+    }, []);    
+
+    const handleModalDelete = useCallback((name:string)=>{
+        //delete (selectedRow)
+        if (name !== undefined) {
+            const newRegex = {
+                action_type: 'DELETE',
+                regex_name : name,
+                regex_value : '' ,
+                modify_user : cookies.WatcherWebUserId
+            };
+            console.log(`[ handleAddNewCompany ]`, newRegex);
+            const result = modifyRegex(newRegex);
+        }
+
+        setModalOpen(false);
+    }, []);    
+
+    const handleModalModify = useCallback((name:string, value:any)=>{
+        //modify (selectedRow)
+        if (value !== undefined) {
+            const newRegex = {
+                action_type: 'UPDATE',
+                regex_name : name,
+                regex_value : value ,
+                modify_user : cookies.WatcherWebUserId
+            };
+            console.log(`[ handleAddNewCompany ]`, newRegex);
+            const result = modifyRegex(newRegex);
+        }
         setModalOpen(false);
     }, []);    
 
@@ -103,12 +137,15 @@ const RegExTable = ({executeQuery}: IRegExTable) => {
                             {selectedRow.regex_name}
                         </Typography>
                         <Typography variant="h6" component="h2" sx={{ display: 'flex', alignItems: 'center', mt: 2 , mb: 2}}>
-                            <TextField defaultValue={selectedRow.regex_value} variant="outlined" sx={{ width: '60%' }}/>
+                            <TextField defaultValue={selectedRow.regex_value} variant="outlined" sx={{ width: '60%' }}
+                                value={value}
+                                onChange = {(e)=>setValue(e.target.value)}
+                            />
                         </Typography>
                         <Stack spacing={3} direction="row" justifyContent='flex-end'>
                             <Button variant="contained" onClick={handleModalClose}>취소</Button> 
-                            <Button variant="contained">삭제</Button>
-                            <Button variant="contained">수정</Button>
+                            <Button variant="contained" onClick={()=>handleModalDelete(selectedRow.regex_name)}>삭제</Button>
+                            <Button variant="contained" onClick={()=>handleModalModify(selectedRow.regex_name, value)}>수정</Button>
                         </Stack>
                     </>
                 )}

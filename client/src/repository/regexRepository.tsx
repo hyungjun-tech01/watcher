@@ -21,10 +21,28 @@ export const RegexRepository = selector({
                 set(atomsRegExData, []);
             }
         });
-       
+
+        const modifyRegex = getCallback(({set, snapshot}) => async (newRegex) => {
+            const input_json = JSON.stringify(newRegex);
+            console.log(`[ modifynewRegex ] input : `, input_json);
+            try{
+                const response = await fetch(`${BASE_PATH}/modifyRegex`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+                const data = await response.json();
+                loadAllRegex();
+
+            }catch(err){
+                console.error(err);
+                set(atomsRegExData, []);
+            }
+        });
 
         return {
-            loadAllRegex
+            loadAllRegex,
+            modifyRegex
         };
     },
 });

@@ -515,7 +515,7 @@ app.post('/modifyRegex', async(req, res) => {
         const out_modify_date = currentDate.currdate;
         const out_recent_user = modify_user;
         
-        res.json({ message:'success', out_product_class_code: out_product_class_code,  out_create_user:out_create_user, 
+        res.json({ message:'success',  out_create_user:out_create_user, 
            out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user }); // 결과 리턴을 해 줌 .  
    
         console.log({ out_create_user:out_create_user, 

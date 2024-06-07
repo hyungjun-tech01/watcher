@@ -1,30 +1,58 @@
-import Checkbox from "@mui/material/Checkbox";
+import { Box, Modal, TextField , Typography , Stack} from '@mui/material';
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import { styled, alpha } from "@mui/material/styles";
-import InputBase from "@mui/material/InputBase";
-import SearchIcon from "@mui/icons-material/Search";
 import Button from '@mui/material/Button';
 
 import Paper from "@mui/material/Paper";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getDateNumberForTable } from "../../constants/DateFns";
 import styles from "./RegExViewContent.module.scss";
+import { useRecoilValue } from 'recoil';
 import RegExTable from "./RegExTable";
+import { RegexRepository } from '../../repository/regexRepository';
+import {useCookies} from "react-cookie";
 
 
 function RegExViewContent() {
     const [executeQuery, setExecuteQuery] = useState<boolean>(false);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [value, setValue] = useState<string>('');
+    const [name, setName] = useState<string>('');
+    const [t] = useTranslation();
+    const { loadAllRegex, modifyRegex } = useRecoilValue(RegexRepository);
+    const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
+
+
+    const handleModalClose = useCallback(()=>{
+        setModalOpen(false);
+    }, []);    
+
+    const handleAddRegex = useCallback((name:string, value:string)=>{
+        //aded (selectedRow)
+        if (name !== undefined) {
+          const newRegex = {
+              action_type: 'ADD',
+              regex_name : name,
+              regex_value : value ,
+              modify_user : cookies.WatcherWebUserId
+          };
+          console.log(`[ handleAddNewCompany ]`, newRegex);
+          const result = modifyRegex(newRegex);
+      }
+
+      setModalOpen(false);
+    }, []);    
+
     useEffect(() => {
         setExecuteQuery(!executeQuery);
       }, []);
 
     const handleAddClick = ()=>{
-
+      setValue('');
+      setName('');
+      setModalOpen(true);
     };
     return (
+      <>
         <div className={styles.content}>
             <Toolbar sx={{height: 40, 
                           minHeight:40,   
@@ -50,9 +78,44 @@ function RegExViewContent() {
             <Paper elevation={3} sx={{ m: 2  }}>
                 <RegExTable
                   executeQuery={executeQuery}
+                  setExecuteQuery={setExecuteQuery}
                 />
             </Paper>
         </div>
+        {/* Modal */}
+        <Modal open={modalOpen} onClose={handleModalClose}>
+                <Box sx={{ 
+                    position: 'absolute' as 'absolute',
+                    top: '20%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    bgcolor: 'background.paper',
+                    border: '2px solid #000',
+                    boxShadow: 24,
+                    width: '75%',
+                    p: 4, }}>
+                <h2>{t('common.regex_add')}</h2>
+                    <>
+                      <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+                        <TextField label={t('common.regex_name')} variant="outlined" sx={{ width: '60%' }}
+                                value={name}
+                                onChange = {(e)=>setName(e.target.value)}
+                            />
+                      </Typography>
+                      <Typography variant="h6" component="h2" sx={{ display: 'flex', alignItems: 'center', mt: 2 , mb: 2}}>
+                          <TextField label={t('common.regex_value')} variant="outlined" sx={{ width: '60%' }}
+                              value={value}
+                              onChange = {(e)=>setValue(e.target.value)}
+                          />
+                      </Typography>
+                      <Stack spacing={3} direction="row" justifyContent='flex-end'>
+                          <Button variant="contained" onClick={handleModalClose}>취소</Button> 
+                          <Button variant="contained" onClick={()=>handleAddRegex(name,value)}>저장</Button>
+                      </Stack>
+                    </>
+                </Box>
+            </Modal>
+      </>
     );
 }
 export default RegExViewContent;
