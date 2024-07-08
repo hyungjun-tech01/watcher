@@ -14,6 +14,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const fs = require('fs').promises; // fs.promises를 사용하여 비동기 파일 작업을 수행합니다.
 const util = require('util');
+const e = require('express');
 
 const ImageLog = "ImageLog";
 const TextLog = "TextLog";
@@ -284,6 +285,34 @@ app.post('/getauditjob', async(req, res) => {
             res.end();   
         }
     }catch(err){
+        console.log(err);
+        res.json({message:err});        
+        res.end();
+    }
+});
+
+app.post('/getPdf', async (req, res) => {
+    const { jobLogId } = req.jobLogId;
+
+    try {
+        const auditJob = await pool.query(` 
+            select file_name as "fileName",
+                job_image_file as "jobImageFile"
+            from tbl_audit_job_log
+            where job_log_id = $1
+            and job_image_file is not null`,
+            [jobLogId]
+            );
+            if (auditJob.rows.length > 0) {
+                const pdf = auditJob.rows[0];
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `attachment; filename=${pdf.fileName}`);
+                res.send(pdf.jobImageFile);
+                res.end(); 
+            }else{
+                res.json({message:'no pdf files'});  
+            }
+    } catch (err) {
         console.log(err);
         res.json({message:err});        
         res.end();

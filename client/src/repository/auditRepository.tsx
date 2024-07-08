@@ -38,10 +38,30 @@ export const AuditRepository = selector({
             }
         });
 
+        const queryPdfJobLog = getCallback(({set}) => async (jobLogId:number) => {
+            const data = {jobLogId:jobLogId};
+            try{
+                const response = await fetch(`${BASE_PATH}/getPdf`,{
+                    method: "POST", 
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify(data)
+                   }); 
+                const json = await response.json();
+                if(json.message) {
+                    console.log('loadAuditJobLog: ', json.message);
+                } else {
+                    set(atomsAuditJobLogData, json);
+                }
+            }catch(err){
+                console.error(err);
+            }
+        });
+
         
         return {
             loadAllAuditJobLog,
-            queryAuditJobLog
+            queryAuditJobLog,
+            queryPdfJobLog
         };
     },
 });
