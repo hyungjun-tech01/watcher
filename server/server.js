@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 const express = require('express');
 const app = express();
 const pool = require('./db');
@@ -526,6 +528,26 @@ app.post('/modifyRegex', async(req, res) => {
         res.end();              
     }
 });
+
+// crypto file Test 
+app.get('/cryptoFile', async(req, res) => {
+    try{
+        const algorithm = 'aes-256-cbc';
+
+        // 파일을 읽어와서 암호화 해서 다시 파일로 저장 할 수 있나?
+        let text = 'Hello World!'; // 암호화 할 문구
+
+        const key = crypto.scryptSync('wolfootjaIsSpecial','specialSalt', 32); // 나만의 암호화키. password, salt, byte 순인데 password와 salt는 본인이 원하는 문구로~ 
+        const iv = crypto.randomBytes(16); //초기화 벡터. 더 강력한 암호화를 위해 사용. 랜덤값이 좋음
+        const cipher = crypto.createCipheriv(algorithm, key, iv); //key는 32바이트, iv는 16바이트
+        let result = cipher.update(text, 'utf8', 'base64');
+        result += cipher.final('base64');
+        console.log('암호화: ', result);
+    }
+    catch(err){
+        console.log(err.message);
+    }
+});   
 
 app.listen(PORT, ()=> {
     console.log(`Server running on PORT ${PORT}`);
