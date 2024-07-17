@@ -42,6 +42,7 @@ app.use(`/${ImageLog}`, express.static(TextLog));
 
 // util.promisify를 사용하여 fs.writeFile을 프로미스로 변환합니다.
 const writeFileAsync = util.promisify(fs.writeFile);
+const readFileAsync = util.promisify(fs.readFile);
 
 // promisify를 사용하여 fs.unlink를 비동기 함수로 변환
 // const unlinkAsync = util.promisify(fs.unlink);
@@ -558,23 +559,103 @@ app.post('/modifyRegex', async(req, res) => {
     }
 });
 
-// crypto file Test 
-app.get('/cryptoFile', async(req, res) => {
+// crypto decryption file 
+app.get('/decryptoFile', async(req, res) => {
     try{
-        const algorithm = 'aes-256-cbc';
+        console.log('decryptoFile...');
+        const algorithm = process.env.CRYPTO_ALGORITHM;;
+        const encryptedFilePath = path.join('ImageLog', '2023', '09', 'P208075312423090411120_encrypted.pdf');
+        const decryptedFilePath = path.join('ImageLog', '2023', '09', 'decrypted_P208075312423090411120.pdf');
+        const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD, process.env.CRYPTO_SALT, 32); // 나만의 암호화키. password, salt, byte 순인데 password와 salt는 본인이 원하는 문구로~ 
+        // 초기화 벡터를 초기화
+        let iv = Buffer.alloc(16);
 
-        // 파일을 읽어와서 암호화 해서 다시 파일로 저장 할 수 있나?
-        let text = 'Hello World!'; // 암호화 할 문구
+        if (fsUpper.existsSync(encryptedFilePath)) {
+            console.log('Reading file...');
+            const readStream = fsUpper.createReadStream(encryptedFilePath);
+            console.log('File read successfully.');
 
-        const key = crypto.scryptSync('wolfootjaIsSpecial','specialSalt', 32); // 나만의 암호화키. password, salt, byte 순인데 password와 salt는 본인이 원하는 문구로~ 
-        const iv = crypto.randomBytes(16); //초기화 벡터. 더 강력한 암호화를 위해 사용. 랜덤값이 좋음
-        const cipher = crypto.createCipheriv(algorithm, key, iv); //key는 32바이트, iv는 16바이트
-        let result = cipher.update(text, 'utf8', 'base64');
-        result += cipher.final('base64');
-        console.log('암호화: ', result);
+            readStream.once('readable', () => {
+                readStream.read(16).copy(iv);
+                console.log('IV:', iv);
+
+                // 복호화 스트림 생성
+                const decipher = crypto.createDecipheriv(algorithm, key, iv);
+
+                // 쓰기 스트림 생성
+                const writeStream = fsUpper.createWriteStream(decryptedFilePath);
+
+                // 스트림 파이프라인 설정
+                readStream.pipe(decipher).pipe(writeStream);
+
+                // 스트림 완료 처리
+                writeStream.on('finish', () => {
+                    console.log('복호화 완료: ', decryptedFilePath);
+                    res.send('파일 복호화 완료');
+                });
+                writeStream.on('error', (err) => {
+                    console.error('파일 쓰기 중 오류 발생:', err);
+                    res.status(500).send('파일 복호화 중 오류 발생');
+                });
+            });
+        }else {
+            res.send('파일을 찾을 수 없습니다.');
+        }
+
+    }catch(err){
+        console.log(err.message);
+        res.send(err.message);
     }
+});
+
+// crypto encryption file Test 
+app.get('/encryptoFile', async(req, res) => {
+    try{
+        const algorithm = process.env.CRYPTO_ALGORITHM;
+
+        const filePath = path.join('ImageLog', '2023', '09', 'P208075312423090411120.pdf');
+        let buffer ;
+        if (fsUpper.existsSync(filePath)) {
+            console.log('Reading file...');
+            // buffer = await  readFileAsync(filePath);
+            
+            //fsUpper.createReadStream(filePath).pipe(res);
+            const readStream = fsUpper.createReadStream(filePath);
+            console.log('File read successfully.');
+
+            const encryptedFilePath = path.join('ImageLog', '2023', '09', 'P208075312423090411120_encrypted.pdf');
+            const writeStream = fsUpper.createWriteStream(encryptedFilePath);
+
+            const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD,process.env.CRYPTO_SALT, 32); // 나만의 암호화키. password, salt, byte 순인데 password와 salt는 본인이 원하는 문구로~ 
+            // 초기화 벡터를 직접 정의 (16바이트 길이의 버퍼)
+            const iv = crypto.randomBytes(16); //초기화 벡터. 더 강력한 암호화를 위해 사용. 랜덤값이 좋음
+            const cipher = crypto.createCipheriv(algorithm, key, iv); //key는 32바이트, iv는 16바이트
+
+            // IV를 파일의 처음에 쓴다
+            writeStream.write(iv);
+
+            // 스트림 파이프라인 설정
+            readStream.pipe(cipher).pipe(writeStream);
+
+            // 스트림 완료 처리
+            writeStream.on('finish', () => {
+                console.log('암호화 완료: ', encryptedFilePath, iv);
+                res.send('파일 암호화 완료');
+            });
+            // 에러 날 경우
+            writeStream.on('error', (err) => {
+                console.error('파일 쓰기 중 오류 발생:', err);
+                res.send('파일 암호화 중 오류 발생');
+            });
+
+        } else {
+            res.send('파일을 찾을 수 없습니다.');
+        }
+    }
+    
     catch(err){
         console.log(err.message);
+        res.send(err.message);
     }
 });   
 
