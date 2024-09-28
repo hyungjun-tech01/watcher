@@ -98,8 +98,8 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
     try{
 
       queryTextContent(path).then(() => {
-        setTextContent(auditTextContent);
-        handleOpen();
+      setTextContent(auditTextContent);
+      handleOpen();
     });
 
       // queryTextContent(path).then();
