@@ -8,9 +8,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 interface IAuditLogPdfViewer {
     pdfUrl: string | undefined,
+    auditPdfContent: Blob|null,
     onClose : (value:boolean) => void,
   };
-const AuditLogPdfViewer = ({pdfUrl, onClose}: IAuditLogPdfViewer) => {
+const AuditLogPdfViewer = ({pdfUrl, auditPdfContent, onClose}: IAuditLogPdfViewer) => {
   const [numPages, setNumPages] = useState<number|null>(null);
 
   const onDocumentLoadSuccess = (pdf: PDFDocumentProxy) => {
@@ -20,39 +21,19 @@ const AuditLogPdfViewer = ({pdfUrl, onClose}: IAuditLogPdfViewer) => {
   console.log(pdfUrl);
   return(
     <div style={{ height: '75vh', overflow: 'auto' }}>
-    <Document
-        file={pdfUrl}
+    { auditPdfContent &&   
+    (<Document
+        file={auditPdfContent}
+        // file={pdfUrl}
         onLoadSuccess={onDocumentLoadSuccess}
         renderMode="canvas"
       >
         {Array.from(new Array(numPages), (el, index) => (
           <Page key={`page_${index + 1}`} pageNumber={index + 1} />
         ))}
-      </Document>
+      </Document>)}
   </div>
   )
-  // useEffect(() => {
-  //   const handleContextMenu = (e:any) => {
-  //     e.preventDefault();
-  //   };
-
-  //   document.addEventListener('contextmenu', handleContextMenu);
-
-  //   // Cleanup the event listener on component unmount
-  //   return () => {
-  //     document.removeEventListener('contextmenu', handleContextMenu);
-  //   };
-  // }, []);
-
-  // return (
-  //   <div>
-  //     <iframe
-  //       title="pdfviewer"
-  //       src={pdfUrl}
-  //       style={{ width: '800px', height: '75vh', border: 'none' }}
-  //     ></iframe>
-  //   </div>
-  // );
 };
 
 export default AuditLogPdfViewer;

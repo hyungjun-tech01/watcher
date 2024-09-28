@@ -27,8 +27,20 @@ export interface IAuditJobLogQueryCondi{
     privacyText : string; 
 }
 
+
+
 export const atomsAuditJobLogData = atom<IAuditJobLog[]>({
   key: 'auditJobLogData',
   default: []
 })
 
+
+export const atomsAuditPdfContent = atom<Blob | null>({
+  key: 'auditJobPdfContent',
+  default: null
+})
+
+export const atomsAuditTextContent = atom<string | null>({
+  key: 'auditJobTextContent',
+  default: null
+})

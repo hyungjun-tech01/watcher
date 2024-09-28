@@ -6,6 +6,7 @@ const pool = require('./db');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const stream = require('stream');  // stream 모듈 가져오기
 
 // multer 미들웨어 사용
 const multer = require('multer');
@@ -184,16 +185,16 @@ app.post('/getauditjob', async(req, res) => {
                     image_archive_path,
                     text_archive_path,
                     original_job_id   as "originaJobId",
-                    $5||'/ImageLog/'||image_archive_path as "imageArchivePath",
-                    $5||'/TextLog/'||text_archive_path as "textArchivePath"
+                    'ImageLog\\'||image_archive_path as "imageArchivePath",
+                    'ImageLog\\'||text_archive_path as "textArchivePath"
                 from tbl_audit_job_log
                 where user_name like '%'||$1||'%' 
                   and send_time >= $2
                   and send_time <= $3
                   and detect_privacy = $4
-                  and privacy_text like '%'||$6||'%' 
+                  and privacy_text like '%'||$5||'%' 
                 order by send_time desc`,
-                [userName, v_sendTimeFrom, v_sendTimeTo,detectPrivacy, MYHOST, privacyText]
+                [userName, v_sendTimeFrom, v_sendTimeTo,detectPrivacy, privacyText]
             ) ;
             res.json(auditJob.rows);
             res.end();
@@ -215,15 +216,15 @@ app.post('/getauditjob', async(req, res) => {
                 image_archive_path,
                 text_archive_path,
                 original_job_id   as "originaJobId",
-                $5||'/ImageLog/'||image_archive_path as "imageArchivePath",
-                $5||'/TextLog/'||text_archive_path as "textArchivePath"
+                'ImageLog\\'||image_archive_path as "imageArchivePath",
+                'ImageLog\\'||text_archive_path as "textArchivePath"
             from tbl_audit_job_log
             where user_name like '%'||$1||'%' 
               and send_time >= $2
               and send_time <= $3
               and detect_privacy = $4
             order by send_time desc`,
-            [userName, v_sendTimeFrom, v_sendTimeTo,detectPrivacy, MYHOST]
+            [userName, v_sendTimeFrom, v_sendTimeTo,detectPrivacy]
             ) ;
             res.json(auditJob.rows);
             res.end();
@@ -245,15 +246,15 @@ app.post('/getauditjob', async(req, res) => {
                 image_archive_path,
                 text_archive_path,
                 original_job_id   as "originaJobId",
-                $4||'/ImageLog/'||image_archive_path as "imageArchivePath",
-                $4||'/TextLog/'||text_archive_path as "textArchivePath"
+                'ImageLog\\'||image_archive_path as "imageArchivePath",
+                'ImageLog\\'||text_archive_path as "textArchivePath"
             from tbl_audit_job_log
             where user_name like '%'||$1||'%' 
               and send_time >= $2
               and send_time <= $3
-              and privacy_text like '%'||$5||'%' 
+              and privacy_text like '%'||$4||'%' 
             order by send_time desc`,   
-            [userName, v_sendTimeFrom, v_sendTimeTo, MYHOST, privacyText]
+            [userName, v_sendTimeFrom, v_sendTimeTo, privacyText]
             );
             res.json(auditJob.rows);
             res.end();           
@@ -275,17 +276,21 @@ app.post('/getauditjob', async(req, res) => {
                 image_archive_path,
                 text_archive_path,
                 original_job_id   as "originaJobId",
-                $4||'/ImageLog/'||image_archive_path as "imageArchivePath",
-                $4||'/TextLog/'||text_archive_path as "textArchivePath"
+                'ImageLog\\'||image_archive_path as "imageArchivePath",
+                'ImageLog\\'||text_archive_path as "textArchivePath"
             from tbl_audit_job_log
             where user_name like '%'||$1||'%' 
               and send_time >= $2
               and send_time <= $3
             order by send_time desc`,
-            [userName, v_sendTimeFrom, v_sendTimeTo, MYHOST]
+            [userName, v_sendTimeFrom, v_sendTimeTo]
             );
             res.json(auditJob.rows);
             res.end();   
+            /**
+                $4||'/ImageLog/'||image_archive_path as "imageArchivePath",
+                $4||'/ImageLog/'||text_archive_path as "textArchivePath"
+             */
         }
     }catch(err){
         console.log(err);
@@ -560,13 +565,18 @@ app.post('/modifyRegex', async(req, res) => {
 });
 
 // crypto decryption file 
-app.get('/decryptoFile', async(req, res) => {
+app.get('/decryptoFileTest', async(req, res) => {
     try{
         console.log('decryptoFile...');
         const algorithm = process.env.CRYPTO_ALGORITHM;;
-        const encryptedFilePath = path.join('ImageLog', '2023', '09', 'P208075312423090411120_encrypted.pdf');
-        const decryptedFilePath = path.join('ImageLog', '2023', '09', 'decrypted_P208075312423090411120.pdf');
-        const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD, process.env.CRYPTO_SALT, 32); // 나만의 암호화키. password, salt, byte 순인데 password와 salt는 본인이 원하는 문구로~ 
+        const encryptedFilePath = path.join('ImageLog', '2023', '09', 'S2K0910023024051013180.epdf');
+        const decryptedFilePath = path.join('ImageLog', '2023', '09', 'decrypted_S2K0910023024051013180.pdf');
+        //const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD, process.env.CRYPTO_SALT, 32); // 나만의 암호화키. password, salt, byte 순인데 password와 salt는 본인이 원하는 문구로~ 
+        //const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD, process.env.CRYPTO_SALT, 32);  // salt 는 사용하지 않았음
+        // key 값 생성: "mylation1!"을 UTF-8로 인코딩하고, 32바이트로 패딩
+        let key = Buffer.alloc(32); // 32바이트의 0으로 채워진 Buffer 생성
+        Buffer.from('mylation1!').copy(key);
+        
         // 초기화 벡터를 초기화
         let iv = Buffer.alloc(16);
 
@@ -576,27 +586,50 @@ app.get('/decryptoFile', async(req, res) => {
             console.log('File read successfully.');
 
             readStream.once('readable', () => {
-                readStream.read(16).copy(iv);
-                console.log('IV:', iv);
+                //readStream.read(16).copy(iv);
+                console.log('IV:', iv, key);
+
+                // Base64 디코딩 스트림 추가
+                const base64Decoder = new stream.Transform({
+                    decodeStrings: true,
+                    transform(chunk, encoding, callback) {
+                        const decodedChunk = Buffer.from(chunk.toString(), 'base64');
+                        callback(null, decodedChunk);
+                    }
+                });
+
 
                 // 복호화 스트림 생성
-                const decipher = crypto.createDecipheriv(algorithm, key, iv);
+                const decipher = crypto.createDecipheriv(process.env.CRYPTO_ALGORITHM, key, iv);
+                decipher.setAutoPadding(true);  // PKCS7 패딩 사용
+                
 
                 // 쓰기 스트림 생성
                 const writeStream = fsUpper.createWriteStream(decryptedFilePath);
 
                 // 스트림 파이프라인 설정
-                readStream.pipe(decipher).pipe(writeStream);
+                //readStream.pipe(decipher).pipe(writeStream);
+                readStream.pipe(base64Decoder).pipe(decipher).pipe(writeStream);
 
                 // 스트림 완료 처리
                 writeStream.on('finish', () => {
                     console.log('복호화 완료: ', decryptedFilePath);
                     res.send('파일 복호화 완료');
                 });
+
+                // 스트림 에러 처리
+                readStream.on('error', (err) => {
+                    console.error('파일 읽기 중 오류 발생:', err);
+                    res.status(500).send('파일 읽기 중 오류 발생'+err.message);
+                });
+                decipher.on('error', (err) => {
+                    console.error('복호화 중 오류 발생:', err);
+                    res.status(500).send('복호화 중 오류 발생'+err.message);
+                });
                 writeStream.on('error', (err) => {
                     console.error('파일 쓰기 중 오류 발생:', err);
-                    res.status(500).send('파일 복호화 중 오류 발생');
-                });
+                    res.status(500).send('파일 쓰기 중 오류 발생'+err.message);
+                });            
             });
         }else {
             res.send('파일을 찾을 수 없습니다.');
@@ -608,12 +641,67 @@ app.get('/decryptoFile', async(req, res) => {
     }
 });
 
+app.post('/decryptoFile', async (req, res) => {
+    const  { 
+        filepath            
+    } = req.body;
+
+    try {
+        console.log('decryptoFile...', filepath);
+        const algorithm = process.env.CRYPTO_ALGORITHM;
+        const encryptedFilePath = path.join(filepath);
+
+        let key = Buffer.alloc(32);
+        Buffer.from(process.env.CRYPTO_PASSWORD).copy(key);
+
+        if (fsUpper.existsSync(encryptedFilePath)) {
+            console.log('Reading file...');
+            //const base64Data = fsUpper.readFileSync(encryptedFilePath, 'utf8'); // 파일을 메모리로 읽어오기 (Base64 데이터)
+            
+            // Base64 디코딩
+            //const encryptedData = Buffer.from(base64Data, 'base64');
+            const encryptedData = fsUpper.readFileSync(encryptedFilePath); 
+
+            // 첫 16바이트는 IV로 사용
+            let iv = Buffer.alloc(16);
+            Buffer.from(process.env.CRYPTO_IV).copy(iv);
+
+            console.log('IV:', iv, key);
+
+            // 복호화 스트림 생성
+            const decipher = crypto.createDecipheriv(algorithm, key, iv);
+            decipher.setAutoPadding(true);  // PKCS7 패딩 사용
+
+            const decryptedData = Buffer.concat([decipher.update(encryptedData), decipher.final()]);
+
+            // 복호화된 데이터를 파일로 저장
+            //fsUpper.writeFileSync(decryptedFilePath, decryptedData);
+
+            //console.log('복호화 완료: ', decryptedFilePath);
+            //res.send('파일 복호화 완료');
+            
+            res.setHeader('Content-Disposition', 'attachment; filename="decrypted.PDF"');
+            res.setHeader('Content-Type', 'application/pdf');  // 파일 형식에 따라 변경 가능
+            
+            res.send(decryptedData);  // 복호화된 데이터를 직접 전송
+
+        } else {
+            res.status(404).send('파일을 찾을 수 없습니다.');
+        }
+
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send(err.message);
+    }
+});
+
+
 // crypto encryption file Test 
 app.get('/encryptoFile', async(req, res) => {
     try{
         const algorithm = process.env.CRYPTO_ALGORITHM;
 
-        const filePath = path.join('ImageLog', '2023', '09', 'P208075312423090411120.pdf');
+        const filePath = path.join('ImageLog', '2023', '09', 'S2K0910023024051013180.pdf');
         let buffer ;
         if (fsUpper.existsSync(filePath)) {
             console.log('Reading file...');
@@ -623,30 +711,71 @@ app.get('/encryptoFile', async(req, res) => {
             const readStream = fsUpper.createReadStream(filePath);
             console.log('File read successfully.');
 
-            const encryptedFilePath = path.join('ImageLog', '2023', '09', 'P208075312423090411120_encrypted.pdf');
+            const encryptedFilePath = path.join('ImageLog', '2023', '09', 'S2K0910023024051013180_encrypted.pdf');
             const writeStream = fsUpper.createWriteStream(encryptedFilePath);
 
-            const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD,process.env.CRYPTO_SALT, 32); // 나만의 암호화키. password, salt, byte 순인데 password와 salt는 본인이 원하는 문구로~ 
+            //const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD,process.env.CRYPTO_SALT, 32); // 나만의 암호화키. password, salt, byte 순인데 password와 salt는 본인이 원하는 문구로~ 
+            //const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD,'', 32); 
+            let key = Buffer.alloc(32);
+            Buffer.from(process.env.CRYPTO_PASSWORD).copy(key);
+
             // 초기화 벡터를 직접 정의 (16바이트 길이의 버퍼)
-            const iv = crypto.randomBytes(16); //초기화 벡터. 더 강력한 암호화를 위해 사용. 랜덤값이 좋음
+            let iv = Buffer.alloc(16);
+            Buffer.from(process.env.CRYPTO_IV).copy(iv);
+            //const iv = crypto.randomBytes(16); //초기화 벡터. 더 강력한 암호화를 위해 사용. 랜덤값이 좋음
+
             const cipher = crypto.createCipheriv(algorithm, key, iv); //key는 32바이트, iv는 16바이트
 
             // IV를 파일의 처음에 쓴다
-            writeStream.write(iv);
+            //writeStream.write(iv);
 
             // 스트림 파이프라인 설정
-            readStream.pipe(cipher).pipe(writeStream);
+            //readStream.pipe(cipher).pipe(writeStream);
 
             // 스트림 완료 처리
-            writeStream.on('finish', () => {
-                console.log('암호화 완료: ', encryptedFilePath, iv);
-                res.send('파일 암호화 완료');
-            });
+            //writeStream.on('finish', () => {
+            //    console.log('암호화 완료: ', encryptedFilePath, iv, key);
+            //    res.send('파일 암호화 완료');
+            //});
             // 에러 날 경우
+            //writeStream.on('error', (err) => {
+            //    console.error('파일 쓰기 중 오류 발생:', err);
+            //    res.send('파일 암호화 중 오류 발생');
+            //});
+
+            // 파일을 읽어서 암호화하고 Base64로 변환
+
+            let encryptedData = Buffer.alloc(0);
+
+            readStream.on('data', (chunk) => {
+                encryptedData = Buffer.concat([encryptedData, cipher.update(chunk)]);
+            });
+
+            readStream.on('end', () => {
+                // 암호화 종료
+                encryptedData = Buffer.concat([encryptedData, cipher.final()]);
+
+                // 암호화된 데이터를 Base64로 변환
+                const encryptedBase64 = encryptedData.toString('base64');
+
+                // Base64로 인코딩된 암호화 데이터를 파일에 저장
+                writeStream.write(encryptedBase64);
+                writeStream.end();
+
+                console.log('암호화 및 Base64 변환 후 파일 저장 완료:', encryptedFilePath);
+                res.send('파일 암호화 및 Base64 저장 완료');
+            });
+
+            readStream.on('error', (err) => {
+                console.error('파일 읽기 중 오류 발생:', err);
+                res.status(500).send('파일 처리 중 오류 발생');
+            });
+
             writeStream.on('error', (err) => {
                 console.error('파일 쓰기 중 오류 발생:', err);
-                res.send('파일 암호화 중 오류 발생');
-            });
+                res.status(500).send('파일 쓰기 중 오류 발생');
+            });          
+
 
         } else {
             res.send('파일을 찾을 수 없습니다.');

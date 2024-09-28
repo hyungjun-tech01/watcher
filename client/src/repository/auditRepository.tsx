@@ -1,5 +1,5 @@
 import { selector } from 'recoil';
-import { atomsAuditJobLogData, IAuditJobLogQueryCondi } from "../atoms/atomsAuditJobLog";
+import { atomsAuditJobLogData, IAuditJobLogQueryCondi, atomsAuditPdfContent, atomsAuditTextContent } from "../atoms/atomsAuditJobLog";
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
@@ -57,11 +57,58 @@ export const AuditRepository = selector({
             }
         });
 
+        const queryPdfContent  = getCallback(({set}) => async (filepath:string) => {
+            const data = {filepath:filepath};
+            try{
+                const response = await fetch(`${BASE_PATH}/decryptoFile`, {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                  });
+                  
+                  if (!response.ok) {
+                    throw new Error('PDF 파일을 가져오는 데 실패했습니다.');
+                  }
+                  
+                  const blob = await response.blob();
+                  set(atomsAuditPdfContent, blob); // Blob을 직접 상태에 저장
+                  console.log("ok");
+            }catch(err){
+                console.error(err);
+            }
+
+        });
+
+        const queryTextContent  = getCallback(({set}) => async (filepath:string) => {
+            const data = {filepath:filepath};
+            //const data = {filepath:"ImageLog\\2023\\09\\C2K0910023024050914190.etxt"};
+            try{
+                const response = await fetch(`${BASE_PATH}/decryptoFile`, {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                  });
+                  
+                  if (!response.ok) {
+                    throw new Error('Text 파일을 가져오는 데 실패했습니다.');
+                  }
+                  
+                  const contentText = await response.text();
+                  set(atomsAuditTextContent, contentText); // Text 직접 상태에 저장
+                  console.log("ok");
+            }catch(err){
+                console.error(err);
+            }
+
+        });        
+        
         
         return {
             loadAllAuditJobLog,
             queryAuditJobLog,
-            queryPdfJobLog
+            queryPdfJobLog,
+            queryPdfContent,
+            queryTextContent
         };
     },
 });

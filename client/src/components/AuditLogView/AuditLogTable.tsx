@@ -4,11 +4,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
 import { Box, Modal } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { atomsAuditJobLogData, IAuditJobLog, IAuditJobLogQueryCondi } from '../../atoms/atomsAuditJobLog';
+import { atomsAuditJobLogData, IAuditJobLog, IAuditJobLogQueryCondi, atomsAuditPdfContent, atomsAuditTextContent } from '../../atoms/atomsAuditJobLog';
 import { AuditRepository } from '../../repository/auditRepository';
 import { useRecoilValue } from 'recoil';
 import Button from '@mui/material/Button';
 import AuditLogPdfViewer from './AuditLogPdfViewer';
+import Paths from "../../constants/Paths";
+const BASE_PATH = Paths.BASE_PATH;
 
 interface IAuditLogTable {
   userName: string | null,
@@ -35,22 +37,29 @@ interface IAuditLogRowData {
 
 const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, executeQuery}: IAuditLogTable) => {
   const [t] = useTranslation();
-  const { queryAuditJobLog } = useRecoilValue(AuditRepository);
+  const { queryAuditJobLog, queryPdfContent, queryTextContent } = useRecoilValue(AuditRepository);
   const auditLogData = useRecoilValue(atomsAuditJobLogData);
+  const auditPdfContent = useRecoilValue(atomsAuditPdfContent);
+  const auditTextContent = useRecoilValue(atomsAuditTextContent);
   const [rowData, setRowData] = useState<IAuditLogRowData[]>([]);
   const [open, setOpen] = useState(false);
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
   const [itemPath, setItemPath] = useState<string>("");
   const [isImage, setIsImage] = useState(false);
-  const [textContent, setTextContent] = useState<string>("");
+  const [textContent, setTextContent] = useState<string|null>(null);
 
   // Pdf 모달 
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const [pdfUrl, setpdfUrl] = useState("");
+  const pdfData = useRecoilValue(atomsAuditPdfContent);
+
   const openPdfModal = useCallback((value:any) => {
     setpdfUrl(value);
+    console.log('pdfpath',value);
+    queryPdfContent(value);
     setIsPdfModalOpen(true)}, []);
+
   const closePdfModal = useCallback(() => setIsPdfModalOpen(false), []);
   
   const queryLogData = useCallback(()=>{
@@ -87,16 +96,23 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
 
   const getTextInTextPath = useCallback(async (path:string) => {
     try{
-      const replace_path = path.replace(/\\/g,'/');
-      const response =  await fetch(`${replace_path}`);
-      const text = response.text();
-      text.then((data)=> {
-        setTextContent(data);
+
+      queryTextContent(path).then(() => {
+        setTextContent(auditTextContent);
         handleOpen();
-      })
+    });
+
+      // queryTextContent(path).then();
+      //const replace_path = path.replace(/\\/g,'/');
+      //const response =  await fetch(`${replace_path}`);
+      //const text = response.text();
+     // text.then((data)=> {
+      // setTextContent(auditTextContent);
+      //  handleOpen();
+      //})
     }
     catch(error) {
-      setTextContent("");
+      setTextContent(null);
     }
   }, [handleOpen]);
 
@@ -107,10 +123,12 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
       const found_idx = value.lastIndexOf('.');
       if(found_idx !== -1){
         //const thumbnail_src = value?.slice(0, found_idx) + '_thumbnail.png';
-        const thumbnail_src = value + '_thumbnail.png';  // hjkim add 2024.05.02
+       
+        const thumbnail_src = BASE_PATH + '/' + value + '_thumbnail.png';  // hjkim add 2024.05.02
         const replace_thumbnail_src = thumbnail_src.replace(/\\/g,'/');
+        console.log('thumbnail_src', replace_thumbnail_src);
         const fileExt = value.slice(found_idx + 1).toLowerCase();
-        const isThisPdf = fileExt === 'pdf';
+        const isThisPdf = fileExt === 'epdf';
         return (
           <div style={{alignItems:'center', textAlign: 'center', cursor:'pointer'}} onClick={()=>{
             if(isThisPdf) {
@@ -306,7 +324,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
             border: '5px solid #000' }}
         >
         <>
-          <AuditLogPdfViewer pdfUrl={pdfUrl} onClose={()=>closePdfModal}/>
+          <AuditLogPdfViewer pdfUrl={pdfUrl} auditPdfContent={auditPdfContent} onClose={()=>closePdfModal}/>
           <div style={{ textAlign: 'right' }}>
             <Button
               type="submit"
