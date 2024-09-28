@@ -564,83 +564,6 @@ app.post('/modifyRegex', async(req, res) => {
     }
 });
 
-// crypto decryption file 
-app.get('/decryptoFileTest', async(req, res) => {
-    try{
-        console.log('decryptoFile...');
-        const algorithm = process.env.CRYPTO_ALGORITHM;;
-        const encryptedFilePath = path.join('ImageLog', '2023', '09', 'S2K0910023024051013180.epdf');
-        const decryptedFilePath = path.join('ImageLog', '2023', '09', 'decrypted_S2K0910023024051013180.pdf');
-        //const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD, process.env.CRYPTO_SALT, 32); // 나만의 암호화키. password, salt, byte 순인데 password와 salt는 본인이 원하는 문구로~ 
-        //const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD, process.env.CRYPTO_SALT, 32);  // salt 는 사용하지 않았음
-        // key 값 생성: "mylation1!"을 UTF-8로 인코딩하고, 32바이트로 패딩
-        let key = Buffer.alloc(32); // 32바이트의 0으로 채워진 Buffer 생성
-        Buffer.from('mylation1!').copy(key);
-        
-        // 초기화 벡터를 초기화
-        let iv = Buffer.alloc(16);
-
-        if (fsUpper.existsSync(encryptedFilePath)) {
-            console.log('Reading file...');
-            const readStream = fsUpper.createReadStream(encryptedFilePath);
-            console.log('File read successfully.');
-
-            readStream.once('readable', () => {
-                //readStream.read(16).copy(iv);
-                console.log('IV:', iv, key);
-
-                // Base64 디코딩 스트림 추가
-                const base64Decoder = new stream.Transform({
-                    decodeStrings: true,
-                    transform(chunk, encoding, callback) {
-                        const decodedChunk = Buffer.from(chunk.toString(), 'base64');
-                        callback(null, decodedChunk);
-                    }
-                });
-
-
-                // 복호화 스트림 생성
-                const decipher = crypto.createDecipheriv(process.env.CRYPTO_ALGORITHM, key, iv);
-                decipher.setAutoPadding(true);  // PKCS7 패딩 사용
-                
-
-                // 쓰기 스트림 생성
-                const writeStream = fsUpper.createWriteStream(decryptedFilePath);
-
-                // 스트림 파이프라인 설정
-                //readStream.pipe(decipher).pipe(writeStream);
-                readStream.pipe(base64Decoder).pipe(decipher).pipe(writeStream);
-
-                // 스트림 완료 처리
-                writeStream.on('finish', () => {
-                    console.log('복호화 완료: ', decryptedFilePath);
-                    res.send('파일 복호화 완료');
-                });
-
-                // 스트림 에러 처리
-                readStream.on('error', (err) => {
-                    console.error('파일 읽기 중 오류 발생:', err);
-                    res.status(500).send('파일 읽기 중 오류 발생'+err.message);
-                });
-                decipher.on('error', (err) => {
-                    console.error('복호화 중 오류 발생:', err);
-                    res.status(500).send('복호화 중 오류 발생'+err.message);
-                });
-                writeStream.on('error', (err) => {
-                    console.error('파일 쓰기 중 오류 발생:', err);
-                    res.status(500).send('파일 쓰기 중 오류 발생'+err.message);
-                });            
-            });
-        }else {
-            res.send('파일을 찾을 수 없습니다.');
-        }
-
-    }catch(err){
-        console.log(err.message);
-        res.send(err.message);
-    }
-});
-
 app.post('/decryptoFile', async (req, res) => {
     const  { 
         filepath            
@@ -655,7 +578,7 @@ app.post('/decryptoFile', async (req, res) => {
         Buffer.from(process.env.CRYPTO_PASSWORD).copy(key);
 
         if (fsUpper.existsSync(encryptedFilePath)) {
-            console.log('Reading file...');
+            
             //const base64Data = fsUpper.readFileSync(encryptedFilePath, 'utf8'); // 파일을 메모리로 읽어오기 (Base64 데이터)
             
             // Base64 디코딩
@@ -666,7 +589,7 @@ app.post('/decryptoFile', async (req, res) => {
             let iv = Buffer.alloc(16);
             Buffer.from(process.env.CRYPTO_IV).copy(iv);
 
-            console.log('IV:', iv, key);
+            
 
             // 복호화 스트림 생성
             const decipher = crypto.createDecipheriv(algorithm, key, iv);
@@ -701,7 +624,7 @@ app.get('/encryptoFile', async(req, res) => {
     try{
         const algorithm = process.env.CRYPTO_ALGORITHM;
 
-        const filePath = path.join('ImageLog', '2023', '09', 'S2K0910023024051013180.pdf');
+        const filePath = path.join('ImageLog', '2023', '09', '1.pdf');
         let buffer ;
         if (fsUpper.existsSync(filePath)) {
             console.log('Reading file...');
@@ -711,11 +634,9 @@ app.get('/encryptoFile', async(req, res) => {
             const readStream = fsUpper.createReadStream(filePath);
             console.log('File read successfully.');
 
-            const encryptedFilePath = path.join('ImageLog', '2023', '09', 'S2K0910023024051013180_encrypted.pdf');
+            const encryptedFilePath = path.join('ImageLog', '2023', '09', '1.pdf');
             const writeStream = fsUpper.createWriteStream(encryptedFilePath);
 
-            //const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD,process.env.CRYPTO_SALT, 32); // 나만의 암호화키. password, salt, byte 순인데 password와 salt는 본인이 원하는 문구로~ 
-            //const key = crypto.scryptSync(process.env.CRYPTO_PASSWORD,'', 32); 
             let key = Buffer.alloc(32);
             Buffer.from(process.env.CRYPTO_PASSWORD).copy(key);
 
@@ -724,25 +645,9 @@ app.get('/encryptoFile', async(req, res) => {
             Buffer.from(process.env.CRYPTO_IV).copy(iv);
             //const iv = crypto.randomBytes(16); //초기화 벡터. 더 강력한 암호화를 위해 사용. 랜덤값이 좋음
 
-            const cipher = crypto.createCipheriv(algorithm, key, iv); //key는 32바이트, iv는 16바이트
+            const cipher = crypto.createCipheriv(algorithm, key, iv); 
 
-            // IV를 파일의 처음에 쓴다
-            //writeStream.write(iv);
-
-            // 스트림 파이프라인 설정
-            //readStream.pipe(cipher).pipe(writeStream);
-
-            // 스트림 완료 처리
-            //writeStream.on('finish', () => {
-            //    console.log('암호화 완료: ', encryptedFilePath, iv, key);
-            //    res.send('파일 암호화 완료');
-            //});
-            // 에러 날 경우
-            //writeStream.on('error', (err) => {
-            //    console.error('파일 쓰기 중 오류 발생:', err);
-            //    res.send('파일 암호화 중 오류 발생');
-            //});
-
+            
             // 파일을 읽어서 암호화하고 Base64로 변환
 
             let encryptedData = Buffer.alloc(0);
