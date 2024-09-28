@@ -126,7 +126,6 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
        
         const thumbnail_src = BASE_PATH + '/' + value + '_thumbnail.png';  // hjkim add 2024.05.02
         const replace_thumbnail_src = thumbnail_src.replace(/\\/g,'/');
-        console.log('thumbnail_src', replace_thumbnail_src);
         const fileExt = value.slice(found_idx + 1).toLowerCase();
         const isThisPdf = fileExt === 'epdf';
         return (
