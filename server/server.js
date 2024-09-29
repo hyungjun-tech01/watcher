@@ -165,7 +165,7 @@ app.post('/getauditjob', async(req, res) => {
     const v_sendTimeFrom = sendTimeFrom.substr(0,6)+'000000';
     const v_sendTimeTo = sendTimeTo.substr(0,6)+'235959';
 
-    console.log('getauditjob Input Value : ', userName, detectPrivacy, v_sendTimeFrom, v_sendTimeTo, privacyText);
+    //console.log('getauditjob Input Value : ', userName, detectPrivacy, v_sendTimeFrom, v_sendTimeTo, privacyText);
     try{
         if ( detectPrivacy === true &&  isPrivacyText === true){
             const auditJob = await pool.query(` 
@@ -555,8 +555,8 @@ app.post('/modifyRegex', async(req, res) => {
         res.json({ message:'success',  out_create_user:out_create_user, 
            out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user }); // 결과 리턴을 해 줌 .  
    
-        console.log({ out_create_user:out_create_user, 
-               out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user });
+        //console.log({ out_create_user:out_create_user, 
+        //       out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user });
     }catch(err){
         console.error(err);
         res.json({message:err.message});   
@@ -570,7 +570,7 @@ app.post('/decryptoFile', async (req, res) => {
     } = req.body;
 
     try {
-        console.log('decryptoFile...', filepath);
+        // console.log('decryptoFile...', filepath);
         const algorithm = process.env.CRYPTO_ALGORITHM;
         const encryptedFilePath = path.join(filepath);
 

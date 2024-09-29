@@ -122,7 +122,6 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
   useEffect(() => {
     if (auditTextContent) {
       setTextContent(auditTextContent); // Recoil 상태를 로컬 상태로 저장
-      console.log('textContent', auditTextContent); // 상태 로그 확인
       handleOpen(); // 필요한 추가 작업
     }
   }, [auditTextContent]); // Recoil 상태가 변경될 때마다 실행
@@ -130,13 +129,13 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
   const renderImageCell =  useCallback((props: GridRenderCellParams<any, string>) => {
     const { value } = props;
 
-    if(value && value !=="") {
+    if(value && value !=="" && value !== null) {
       const found_idx = value.lastIndexOf('.');
       if(found_idx !== -1){
         //const thumbnail_src = value?.slice(0, found_idx) + '_thumbnail.png';
         const nameWithoutExtension = value.substring(0, found_idx);
         const thumbnail_src = BASE_PATH + '/' + nameWithoutExtension + '_thumbnail.png';  // hjkim add 2024.05.02
-        console.log('thumbnail_src', thumbnail_src);
+        //console.log('thumbnail_src', thumbnail_src);
         const replace_thumbnail_src = thumbnail_src.replace(/\\/g,'/');
         const fileExt = value.slice(found_idx + 1).toLowerCase();
         const isThisPdf = fileExt === 'epdf';

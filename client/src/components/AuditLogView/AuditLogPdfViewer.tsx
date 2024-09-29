@@ -18,7 +18,7 @@ const AuditLogPdfViewer = ({pdfUrl, auditPdfContent, onClose}: IAuditLogPdfViewe
     setNumPages(pdf.numPages);
   };
 
-  console.log(pdfUrl);
+ // console.log(pdfUrl);
   return(
     <div style={{ height: '75vh', overflow: 'auto' }}>
     { auditPdfContent &&   
@@ -29,7 +29,7 @@ const AuditLogPdfViewer = ({pdfUrl, auditPdfContent, onClose}: IAuditLogPdfViewe
         renderMode="canvas"
       >
         {Array.from(new Array(numPages), (el, index) => (
-          <Page key={`page_${index + 1}`} pageNumber={index + 1} />
+          <Page key={`page_${pdfUrl}${index + 1}`} pageNumber={index + 1} />
         ))}
       </Document>)}
   </div>
