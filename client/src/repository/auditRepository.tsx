@@ -96,6 +96,7 @@ export const AuditRepository = selector({
                   const contentText = await response.text();
                   set(atomsAuditTextContent, contentText); // Text 직접 상태에 저장
                   console.log("ok", contentText);
+                  console.log("ok", atomsAuditTextContent);
             }catch(err){
                 console.error(err);
             }

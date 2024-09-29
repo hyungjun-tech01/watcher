@@ -94,27 +94,38 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
     setRowData(updatedRowData);
   }, []);
 
-  const getTextInTextPath = useCallback(async (path:string) => {
-    try{
+  // const getTextInTextPath = useCallback(async (path:string) => {
+  //   try{
 
-      queryTextContent(path).then(() => {
-      setTextContent(auditTextContent);
-      handleOpen();
-    });
+  //     queryTextContent(path).then(() => {
+  //       setTextContent(auditTextContent);
+  //       console.log('textContent', auditTextContent);
+  //       handleOpen();
+  //     });
+  //   }
+  //   catch(error) {
+  //     setTextContent(null);
+  //   }
+  // }, [handleOpen]);
 
-      // queryTextContent(path).then();
-      //const replace_path = path.replace(/\\/g,'/');
-      //const response =  await fetch(`${replace_path}`);
-      //const text = response.text();
-     // text.then((data)=> {
-      // setTextContent(auditTextContent);
-      //  handleOpen();
-      //})
-    }
-    catch(error) {
+  const getTextInTextPath = useCallback(async (path: string) => {
+    try {
+      // 비동기 함수가 완료되면 상태 업데이트가 비동기적으로 일어남
+      await queryTextContent(path);
+      // 상태가 업데이트된 후에 처리
+    } catch (error) {
       setTextContent(null);
     }
-  }, [handleOpen]);
+  }, []); // handleOpen은 필요하지 않다면 제거 가능
+  
+  // Recoil 상태가 변경될 때 실행
+  useEffect(() => {
+    if (auditTextContent) {
+      setTextContent(auditTextContent); // Recoil 상태를 로컬 상태로 저장
+      console.log('textContent', auditTextContent); // 상태 로그 확인
+      handleOpen(); // 필요한 추가 작업
+    }
+  }, [auditTextContent]); // Recoil 상태가 변경될 때마다 실행
 
   const renderImageCell =  useCallback((props: GridRenderCellParams<any, string>) => {
     const { value } = props;
