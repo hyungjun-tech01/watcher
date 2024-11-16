@@ -123,7 +123,7 @@ const Login = () => {
   const defaultTheme = createTheme();
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="sm">
         <CssBaseline />
         <Box
           sx={{
@@ -133,11 +133,17 @@ const Login = () => {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+          {/* <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
+          </Avatar> */}
+          <Typography component="h1" sx={{ fontWeight: 'bold' }} variant="h4">
+            {t('common.applicationTitle')}
+          </Typography>
+          <Typography component="h1" sx={{ fontWeight: 'bold' }} variant="h4">
+            {t('common.applicationName')}
+          </Typography>
+          <Typography component="h1" variant="h6" sx={{ fontWeight: 'bold', marginTop: 4 }}>
+            {t('common.login')}
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
