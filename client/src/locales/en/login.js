@@ -14,6 +14,7 @@ const login = {
       applicationTitle:'Printing Security Management System',
       applicationName:'Watcher 1.1',
       login:'LogIn',
+      userId: 'User Id',
     },
 
     action: {

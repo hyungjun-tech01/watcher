@@ -145,29 +145,34 @@ const Login = () => {
           <Typography component="h1" variant="h6" sx={{ fontWeight: 'bold', marginTop: 4 }}>
             {t('common.login')}
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="User Id"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              onClick={onMessageDismiss}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              helperText= {t(loginError.content)}
-            />
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3,  width: '100%' }}>
+            <Box display="flex" alignItems="center"  sx={{ mb: 2,   gap: 2 }}>
+              <Typography variant="body1" component="label" htmlFor="email" sx={{ minWidth: 90, whiteSpace: 'nowrap' }}>
+                {t('common.userId')}
+              </Typography>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                onClick={onMessageDismiss}
+              />
+            </Box>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                helperText= {t(loginError.content)}
+              />
+
             <Button
               type="submit"
               fullWidth

@@ -8,6 +8,7 @@ const login = {
       applicationTitle:'출력보안 관리 시스템',
       applicationName:'Watcher 1.1',
       login:'로그인',
+      userId : '사용자 이름'
     },
   },
 };
