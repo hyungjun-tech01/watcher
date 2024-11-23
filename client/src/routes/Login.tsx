@@ -92,7 +92,7 @@ const Login = () => {
       event.preventDefault();
       const data = new FormData(event.currentTarget);
       const user_data = {
-        email: data.get("email"),
+        username: data.get("username"),
         password: data.get("password"),
       };
       onValid(user_data);
@@ -154,37 +154,53 @@ const Login = () => {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                name="email"
-                autoComplete="email"
+                id="username"
+                name="username"
+                autoComplete="username"
                 autoFocus
                 onClick={onMessageDismiss}
               />
             </Box>
+            <Box display="flex" alignItems="center"  sx={{ mb: 2,   gap: 2 }}>
+              <Typography variant="body1" component="label" htmlFor="password" sx={{ minWidth: 90, whiteSpace: 'nowrap' }}>
+                {t('common.password')}
+              </Typography>
               <TextField
                 margin="normal"
                 required
                 fullWidth
-                name="password"
-                label="Password"
-                type="password"
                 id="password"
+                name="password"
+                type="password"
                 autoComplete="current-password"
                 helperText= {t(loginError.content)}
               />
-
+            </Box>            
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 , 
+                   height: "50px", 
                    backgroundColor:"#19892BFF",
                    ":hover": { backgroundColor: "#0D7621FF" }
                   }}
             >
               {t("action.Login")}
             </Button>
-            <Grid container>
+            <Grid container  justifyContent="center">
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                }}
+              >
+                <Typography variant="body1" component="label" htmlFor="forgotUserPassword" sx={{ minWidth: 90, whiteSpace: 'nowrap' }}>
+                  {t('common.forgotUserPassword')}
+                </Typography>
+              </Box>
             </Grid>
           </Box>
         </Box>

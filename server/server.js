@@ -94,23 +94,55 @@ app.get('/', (req, res)=>{
 });
 
 //login
+// app.post('/login', async(req, res) => {
+//     const {username, password} = req.body;
+//     try{
+//         //const users = await pool.query('SELECT * FROM user_account WHERE email = $1', [username]);
+//         //if(!users.rows.length) return res.json({message:'Invalid email or password'});
+//         const adminUserId = 'admin';
+//         const adminPassword = '$2b$10$smDUBTdRbt6bnzwIcQkoX.MJgaD21lIxoT9AgE1zW2/EYUROUDlnG';
+
+//         if (adminUserId !== username ){
+//             res.json({message:"Invalid email or password"});
+//             return;
+//         }
+
+//         const success = await bcrypt.compare(password, adminPassword);
+//         const token = jwt.sign({email}, 'secret', {expiresIn:'1hr'});
+//         if(success){
+//             res.json({'userId' : 'admin','userName' : 'adiministrator', token});
+//         }else{
+//             res.json({message:"Invalid email or password"});
+//         }
+//         res.end();
+//     }catch(err){
+//         console.error(err);
+//         res.json({message:err});        
+//         res.end();
+//     }
+// });
+
 app.post('/login', async(req, res) => {
-    const {email, password} = req.body;
+    const {username, password} = req.body;
     try{
-        //const users = await pool.query('SELECT * FROM user_account WHERE email = $1', [email]);
-        //if(!users.rows.length) return res.json({message:'Invalid email or password'});
-        const adminUserId = 'admin';
-        const adminPassword = '$2b$10$smDUBTdRbt6bnzwIcQkoX.MJgaD21lIxoT9AgE1zW2/EYUROUDlnG';
+        const users = await pool.query('SELECT user_id, user_name, password FROM tbl_user WHERE user_name = $1', [username]);
+        if(!users.rows.length) return res.json({message:'Invalid userName or password'});
+     //   const adminUserId = 'admin';
+     //   const adminPassword = '$2b$10$smDUBTdRbt6bnzwIcQkoX.MJgaD21lIxoT9AgE1zW2/EYUROUDlnG';
 
-        if (adminUserId !== email ){
-            res.json({message:"Invalid email or password"});
-            return;
-        }
+     //   if (adminUserId !== username ){
+     //       res.json({message:"Invalid email or password"});
+     //       return;
+     //   }
 
-        const success = await bcrypt.compare(password, adminPassword);
-        const token = jwt.sign({email}, 'secret', {expiresIn:'1hr'});
+     //   const success = await bcrypt.compare(password, adminPassword);
+     
+        console.log(users.rows[0].password);
+        const success = await bcrypt.compare(password, users.rows[0].password);
+
+        const token = jwt.sign({username}, 'secret', {expiresIn:'1hr'});
         if(success){
-            res.json({'userId' : 'admin','userName' : 'adiministrator', token});
+            res.json({'userId' : username,'userName' : username, token});
         }else{
             res.json({message:"Invalid email or password"});
         }

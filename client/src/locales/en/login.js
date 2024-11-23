@@ -15,6 +15,8 @@ const login = {
       applicationName:'Watcher 1.1',
       login:'LogIn',
       userId: 'User Id',
+      password : 'Password',
+      forgotUserPassword :'Forgot username or password?',
     },
 
     action: {
