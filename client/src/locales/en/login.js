@@ -17,6 +17,8 @@ const login = {
       userId: 'User Id',
       password : 'Password',
       forgotUserPassword :'Forgot username or password?',
+      resetPassword :'Reset Password',
+      resetPasswordText : 'Enter your account&apos;s email address, and we&apos;ll send you a link to reset your password.',
     },
 
     action: {

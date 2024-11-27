@@ -25,6 +25,7 @@ export interface IAuditJobLogQueryCondi{
     sendTimeFrom : string;
     sendTimeTo : string;
     privacyText : string; 
+    currentUserName:string,
 }
 
 

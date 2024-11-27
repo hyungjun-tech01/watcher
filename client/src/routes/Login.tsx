@@ -13,11 +13,13 @@ import {
   Grid,
   TextField,
   Typography,
+  Link,
 } from "@mui/material";
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Path from "../constants/Paths";
+import ForgotPassword from './ForgotPassword';
 
 const Copyright = (props: any) => {
   return (
@@ -41,7 +43,7 @@ const createMessage = (error: IError) => {
     return error;
   }
   switch (error.message) {
-    case "Invalid email or password":
+    case "Invalid userName or password":
       return {
         ...error,
         type: "error",
@@ -86,6 +88,22 @@ const Login = () => {
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState<IError>(initErrorContent);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [forgotPassword, setForgotPassword] = React.useState(false);
+
+  const handleClickForgotPasswordOpen= () => {
+    const usernameInput = document.getElementById("username") as HTMLInputElement;
+    if (usernameInput) {
+      usernameInput.value = ""; // 값 초기화
+    }
+    const passwordInput = document.getElementById("password") as HTMLInputElement;
+    if (passwordInput) {
+      passwordInput.value = ""; // 값 초기화
+    }
+    setForgotPassword(true);
+  };
+  const handleClickForgotPasswordClose= () => {
+    setForgotPassword(false);
+  };  
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -197,15 +215,24 @@ const Login = () => {
                   alignItems: 'center', 
                 }}
               >
-                <Typography variant="body1" component="label" htmlFor="forgotUserPassword" sx={{ minWidth: 90, whiteSpace: 'nowrap' }}>
-                  {t('common.forgotUserPassword')}
-                </Typography>
+                <Link
+                  component="button"
+                  type="button"
+                  onClick={handleClickForgotPasswordOpen}
+                  variant="body2"
+                  sx={{ alignSelf: 'center' }}
+                >
+                  <Typography variant="body1" component="label" htmlFor="forgotUserPassword" sx={{ minWidth: 90, whiteSpace: 'nowrap' }}>
+                    {t('common.forgotUserPassword')}
+                  </Typography>
+                </Link>  
               </Box>
             </Grid>
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
+      <ForgotPassword open={forgotPassword} handleClose={handleClickForgotPasswordClose} />
     </ThemeProvider>
   );
 };

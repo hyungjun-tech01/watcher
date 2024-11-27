@@ -127,25 +127,31 @@ app.post('/login', async(req, res) => {
     try{
         const users = await pool.query('SELECT user_id, user_name, password FROM tbl_user WHERE user_name = $1', [username]);
         if(!users.rows.length) return res.json({message:'Invalid userName or password'});
-     //   const adminUserId = 'admin';
-     //   const adminPassword = '$2b$10$smDUBTdRbt6bnzwIcQkoX.MJgaD21lIxoT9AgE1zW2/EYUROUDlnG';
+   
 
-     //   if (adminUserId !== username ){
-     //       res.json({message:"Invalid email or password"});
-     //       return;
-     //   }
+        // alogrithm 
+        const algorithm = process.env.CRYPTO_ALGORITHM;
+        // key 
+        let key = Buffer.alloc(32);
+        Buffer.from(process.env.CRYPTO_PASSWORD).copy(key);
 
-     //   const success = await bcrypt.compare(password, adminPassword);
-     
-        console.log(users.rows[0].password);
-        const success = await bcrypt.compare(password, users.rows[0].password);
+        // 초기화 벡터를 직접 정의 (16바이트 길이의 버퍼)
+        let iv = Buffer.alloc(16);
+        Buffer.from(process.env.CRYPTO_IV).copy(iv);
+        
+        const cipher = crypto.createCipheriv(algorithm, key, iv); 
 
-        const token = jwt.sign({username}, 'secret', {expiresIn:'1hr'});
-        if(success){
+        let passwordComapre = cipher.update(password, 'utf8', 'base64');
+
+        passwordComapre += cipher.final('base64');
+
+        if(passwordComapre === users.rows[0].password) {
+            const token = jwt.sign({username}, 'secret', {expiresIn:'1hr'});
             res.json({'userId' : username,'userName' : username, token});
         }else{
-            res.json({message:"Invalid email or password"});
+            res.json({message:"Invalid userName or password"});
         }
+
         res.end();
     }catch(err){
         console.error(err);
@@ -154,8 +160,50 @@ app.post('/login', async(req, res) => {
     }
 });
 
+app.post('/passwordChange', async(req, res) => {
+    const {username, email, password} = req.body;
+    try{
+        const users = await pool.query('SELECT user_id, user_name, password FROM tbl_user WHERE user_name = $1 and email= $2', [username, email]);
+        if(!users.rows.length) return res.json({message:'Invalid userName or email'});
+   
+
+        // alogrithm 
+        const algorithm = process.env.CRYPTO_ALGORITHM;
+        // key 
+        let key = Buffer.alloc(32);
+        Buffer.from(process.env.CRYPTO_PASSWORD).copy(key);
+
+        // 초기화 벡터를 직접 정의 (16바이트 길이의 버퍼)
+        let iv = Buffer.alloc(16);
+        Buffer.from(process.env.CRYPTO_IV).copy(iv);
+        
+        const cipher = crypto.createCipheriv(algorithm, key, iv); 
+
+        let passwordChange = cipher.update(password, 'utf8', 'base64');
+
+        passwordChange += cipher.final('base64');
+
+        const response = await pool.query(`
+                    update tbl_user 
+                        set password    = $1
+                        where user_name = $2
+                        and email = $3
+                `,[passwordChange,  username, email]);
+
+        res.json({'userId' : username,'userName' : username});
+        res.end();
+    }catch(err){
+        console.error(err);
+        res.json({message:err});        
+        res.end();
+    }
+});
+
+
+
 // query audit job log
 app.get('/getAllAuditJob', async(req, res) => {
+
     try{
         const auditJob = await pool.query(` 
             select job_log_id as "jobLogId",
@@ -190,7 +238,8 @@ app.post('/getauditjob', async(req, res) => {
         detectPrivacy,
         sendTimeFrom,
         sendTimeTo,
-        privacyText } = req.body;
+        privacyText,
+        currentUserName } = req.body;
     const transferDetectprivacy = detectPrivacy? true:null;    
 
     const isPrivacyText = privacyText? true:false;
@@ -199,6 +248,10 @@ app.post('/getauditjob', async(req, res) => {
 
     //console.log('getauditjob Input Value : ', userName, detectPrivacy, v_sendTimeFrom, v_sendTimeTo, privacyText);
     try{
+
+        // currentUserName -> security group list  찾기 
+        // => 해당 security group list 가 포함된  job log  조회 
+
         if ( detectPrivacy === true &&  isPrivacyText === true){
             const auditJob = await pool.query(` 
                 select job_log_id as "jobLogId",
@@ -225,8 +278,15 @@ app.post('/getauditjob', async(req, res) => {
                   and send_time <= $3
                   and detect_privacy = $4
                   and privacy_text like '%'||$5||'%' 
+                  and security_group_name in 
+                        (select security_group_name 
+                            from tbl_security_group_admin
+                            where security_group_admin_name = $6
+                            and security_group_admin_start_date <= CURRENT_DATE
+                            and (security_group_admin_end_date is null or security_group_admin_end_date >= CURRENT_DATE)
+                        )
                 order by send_time desc`,
-                [userName, v_sendTimeFrom, v_sendTimeTo,detectPrivacy, privacyText]
+                [userName, v_sendTimeFrom, v_sendTimeTo,detectPrivacy, privacyText, currentUserName]
             ) ;
             res.json(auditJob.rows);
             res.end();
@@ -255,8 +315,15 @@ app.post('/getauditjob', async(req, res) => {
               and send_time >= $2
               and send_time <= $3
               and detect_privacy = $4
+              and security_group_name in 
+                (select security_group_name 
+                    from tbl_security_group_admin
+                    where security_group_admin_name = $5
+                    and security_group_admin_start_date <= CURRENT_DATE
+                    and (security_group_admin_end_date is null or security_group_admin_end_date >= CURRENT_DATE)
+                )              
             order by send_time desc`,
-            [userName, v_sendTimeFrom, v_sendTimeTo,detectPrivacy]
+            [userName, v_sendTimeFrom, v_sendTimeTo,detectPrivacy, currentUserName]
             ) ;
             res.json(auditJob.rows);
             res.end();
@@ -285,8 +352,15 @@ app.post('/getauditjob', async(req, res) => {
               and send_time >= $2
               and send_time <= $3
               and privacy_text like '%'||$4||'%' 
+              and security_group_name in 
+                        (select security_group_name 
+                            from tbl_security_group_admin
+                            where security_group_admin_name = $5
+                            and security_group_admin_start_date <= CURRENT_DATE
+                            and (security_group_admin_end_date is null or security_group_admin_end_date >= CURRENT_DATE)
+                        )
             order by send_time desc`,   
-            [userName, v_sendTimeFrom, v_sendTimeTo, privacyText]
+            [userName, v_sendTimeFrom, v_sendTimeTo, privacyText, currentUserName]
             );
             res.json(auditJob.rows);
             res.end();           
@@ -314,8 +388,15 @@ app.post('/getauditjob', async(req, res) => {
             where user_name like '%'||$1||'%' 
               and send_time >= $2
               and send_time <= $3
+              and security_group_name in 
+                        (select security_group_name 
+                            from tbl_security_group_admin
+                            where security_group_admin_name = $4
+                            and security_group_admin_start_date <= CURRENT_DATE
+                            and (security_group_admin_end_date is null or security_group_admin_end_date >= CURRENT_DATE)
+                        )
             order by send_time desc`,
-            [userName, v_sendTimeFrom, v_sendTimeTo]
+            [userName, v_sendTimeFrom, v_sendTimeTo, currentUserName]
             );
             res.json(auditJob.rows);
             res.end();   

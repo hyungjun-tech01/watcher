@@ -17,3 +17,19 @@ export async function  apiLoginValidate(data:IValidateUser) {
         return(err);
     }
  }
+
+ export async function  apiPasswordChange(data:IValidateUser) {
+    try{
+        const response = await fetch(`${BASE_PATH}/passwordChange`,{
+            method: "POST", 
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(data)
+           }); 
+        const responseMessage = await response.json();
+        console.log(responseMessage);
+           return(responseMessage);
+    }catch(err){
+        console.error(err);
+        return(err);
+    }
+ }

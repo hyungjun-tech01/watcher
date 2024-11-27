@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { atomsAuditJobLogData, IAuditJobLog, IAuditJobLogQueryCondi, atomsAuditPdfContent, atomsAuditTextContent } from '../../atoms/atomsAuditJobLog';
 import { AuditRepository } from '../../repository/auditRepository';
 import { useRecoilValue } from 'recoil';
+import {useCookies} from "react-cookie";
 import Button from '@mui/material/Button';
 import AuditLogPdfViewer from './AuditLogPdfViewer';
 import Paths from "../../constants/Paths";
@@ -37,6 +38,7 @@ interface IAuditLogRowData {
 
 const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, executeQuery}: IAuditLogTable) => {
   const [t] = useTranslation();
+  const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
   const { queryAuditJobLog, queryPdfContent, queryTextContent } = useRecoilValue(AuditRepository);
   const auditLogData = useRecoilValue(atomsAuditJobLogData);
   const auditPdfContent = useRecoilValue(atomsAuditPdfContent);
@@ -71,6 +73,7 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
       sendTimeFrom : fromTime.toString(),
       sendTimeTo : toTime.toString(),
       privacyText : privacyText ? privacyText :'',
+      currentUserName : cookies.WatcherWebUserName,
     };
     queryAuditJobLog(queryInput);
   }, [executeQuery]);
