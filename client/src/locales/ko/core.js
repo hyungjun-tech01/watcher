@@ -42,6 +42,9 @@ const core = {
       auditlogview:'Audit Log',
       home:'Home',
       regex:'정규식',
+      setting:'설정',
+      security_group:'보안그룹',
+      change_password:'비밀번호 변경',
     }
   },
 };

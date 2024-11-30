@@ -261,7 +261,10 @@ const core = {
     menu:{
       auditlogview:'Audit Log',
       home:'Home',
-      regex:'Regular Expression'
+      regex:'Regular Expression',
+      setting:'Settings',
+      security_group:'Security Group',
+      change_password:'Change Password',
     }
   },
 };

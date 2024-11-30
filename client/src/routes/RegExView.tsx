@@ -29,7 +29,7 @@ function RegExView(){
             <SideBar />
           </div> 
           <div className ={styles.content}>
-            <Header path={t('menu.home')+' > '+t('menu.regex')}/>
+            <Header path={t('menu.home')+' > '+t('menu.setting')}/>
             <RegExViewContent  />
           </div>
         </div>
