@@ -1,24 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { List, ListItem, ListItemButton, ListItemText, Paper, Box , Typography, Toolbar, Button} from '@mui/material';
 import { useTranslation } from "react-i18next";
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
 import styles from "./SecurityGroupViewContent.module.scss";
+import { SecurityGroupRepository } from '../../repository/securityGroupRepository';
+import { atomsSecurityGroupData, atomsSecurityGroupAdminData, ISecurityGroup, ISecurityGroupAdmin } from '../../atoms/atomsSecurityGroup';
+import { useRecoilValue } from 'recoil';
+import {useCookies} from "react-cookie";
+
 
 
 function SecurityGroupViewContent(){
     const [t] = useTranslation();
     const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
+    const [selectedAdmin, setSelectedAdmin] = useState<string | null>(null);
+    const { loadSecurityGroup, loadSecurityGroupAdmin } = useRecoilValue(SecurityGroupRepository);
+    const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
+    const [executeQuery, setExecuteQuery] = useState(true);
+    const [executeAdminQuery, setExecuteAdminQuery]  = useState(true);
+    const securityGroupData = useRecoilValue(atomsSecurityGroupData);
+    const securityGroupAdminData = useRecoilValue(atomsSecurityGroupAdminData);
+
 
     const options = ["일반","내부감사"];
 
-    const manager = ["정낙준","홍길동","정낙준","홍길동","정낙준","홍길동","정낙준","홍길동"];
+    const manager = ["정낙준","홍길동"];
 
     const dept = ["인사부","감사실"];
   
-    const handleSelect = (interest: string) => {
-      setSelectedInterest(interest);
+    const handleSelect = (option: ISecurityGroup) => {
+      setSelectedInterest(option.security_group_name);
+      
+      const data = {username : cookies.WatcherWebUserName, security_group_name:option.security_group_name};
+      loadSecurityGroupAdmin(data);
     };    
+    const handleSelectManager = (option:ISecurityGroupAdmin) =>{
+        setSelectedAdmin(option.security_group_admin_name);
+    }
+    const handleSelectDept = (option:string) =>{
+
+    }
+
+    const querySecurityGroup = useCallback(()=>{
+        const data = {username : cookies.WatcherWebUserName, security_group_name:''};
+        loadSecurityGroup(data);
+    }, [executeQuery]);    
+
+    const querySecurityGroupAdmin = useCallback(()=>{
+        const data = {username : cookies.WatcherWebUserName, security_group_name:selectedInterest};
+        console.log('execute_querySecurityGroupAdmin');
+        loadSecurityGroupAdmin(data);
+    }, [executeAdminQuery]);    
+
+    useEffect(() => {
+        querySecurityGroup();
+        querySecurityGroupAdmin();
+        setExecuteQuery(!executeQuery);
+        setExecuteAdminQuery(!executeAdminQuery);
+      }, []);
+
     return(
         <div className={styles.content} >
                     
@@ -100,13 +141,13 @@ function SecurityGroupViewContent(){
                         minHeight:200,
                     }}  
                 >
-                    {options.map((option) => (
-                    <ListItem key={option} disablePadding>
+                    {securityGroupData.map((option) => (
+                    <ListItem key={option.security_group_name} disablePadding>
                         <ListItemButton
-                        selected={selectedInterest === option}
+                        selected={selectedInterest === option.security_group_name}
                         onClick={() => handleSelect(option)}
                         sx={{
-                            bgcolor: selectedInterest === option ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
+                            bgcolor: selectedInterest === option.security_group_name ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
                             '&.Mui-selected': {
                             bgcolor: '#1976d2', // 선택 상태일 때 배경색
                             },
@@ -118,7 +159,7 @@ function SecurityGroupViewContent(){
                             },
                         }}
                         >
-                        <ListItemText primary={option} />
+                        <ListItemText primary={option.security_group_name} />
                         </ListItemButton>
                     </ListItem>
                     ))}
@@ -198,13 +239,13 @@ function SecurityGroupViewContent(){
                         minHeight:200,
                     }}  
                 >
-                    {manager.map((option) => (
-                    <ListItem key={option} disablePadding>
+                    {securityGroupAdminData.map((option) => (
+                    <ListItem key={option.security_group_admin_name} disablePadding>
                         <ListItemButton
-                        selected={selectedInterest === option}
-                        onClick={() => handleSelect(option)}
+                        selected={selectedInterest === option.security_group_admin_name}
+                        onClick={() => handleSelectManager(option)}
                         sx={{
-                            bgcolor: selectedInterest === option ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
+                            bgcolor: selectedInterest === option.security_group_admin_name ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
                             '&.Mui-selected': {
                             bgcolor: '#1976d2', // 선택 상태일 때 배경색
                             },
@@ -216,7 +257,7 @@ function SecurityGroupViewContent(){
                             },
                         }}
                         >
-                        <ListItemText primary={option} />
+                        <ListItemText primary={option.full_name} />
                         </ListItemButton>
                     </ListItem>
                     ))}
@@ -298,7 +339,7 @@ function SecurityGroupViewContent(){
                     <ListItem key={option} disablePadding>
                         <ListItemButton
                         selected={selectedInterest === option}
-                        onClick={() => handleSelect(option)}
+                        onClick={() => handleSelectDept(option)}
                         sx={{
                             bgcolor: selectedInterest === option ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
                             '&.Mui-selected': {

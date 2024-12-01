@@ -11,7 +11,7 @@ const login = {
       projectManagement: 'Project management',
       serverConnectionFailed: 'Server connection failed',
       unknownError: 'Unknown error, try again later',
-      noSecurityAdmin:'No Security Administroator.',
+      noSecurityAdmin:'No Security Administroator.  ',
       applicationTitle:'Printing Security Management System',
       applicationName:'Watcher 1.1',
       login:'LogIn',
