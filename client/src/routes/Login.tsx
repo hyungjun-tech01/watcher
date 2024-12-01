@@ -61,6 +61,12 @@ const createMessage = (error: IError) => {
         type: "warning",
         content: "common.noInternetConnection",
       };
+    case "No Security Admin":
+        return {
+          ...error,
+          type: "warning",
+          content: "common.noSecurityAdmin",
+        };  
     default:
       return {
         ...error,

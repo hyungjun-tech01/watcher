@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { List, ListItem, ListItemButton, ListItemText, Paper, Box , Typography, Toolbar, Button} from '@mui/material';
+import { useTranslation } from "react-i18next";
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
 import styles from "./SecurityGroupViewContent.module.scss";
 
 
 function SecurityGroupViewContent(){
+    const [t] = useTranslation();
     const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
 
     const options = ["일반","내부감사"];
@@ -23,7 +25,7 @@ function SecurityGroupViewContent(){
         <Box sx={{ width: '100%', 
             display: 'flex', // 수평 배치 설정
             // justifyContent: 'space-between', // 두 컴포넌트 사이에 공간을 배분
-            gap:4,
+            gap:10,
             ml:2,
             }}>
 
@@ -41,10 +43,10 @@ function SecurityGroupViewContent(){
                     }} >
                     <div className={styles.checkboxSearchStack} >
                         <Typography
-                            variant="h6"
-                            sx={{ mt: 3, mb: 5, fontWeight: 'bold'
+                            variant="body1"
+                            sx={{ mt: 5, mb: 5, fontWeight: 'bold'
                                 }}
-                        >보안그룹
+                        >{t('common.security_group')}
                         </Typography>   
                     </div>
                 </Toolbar>
@@ -63,7 +65,7 @@ function SecurityGroupViewContent(){
                         backgroundColor: '#1976d2',  // 클릭 시 배경색
                         },
                     }}>
-                    <AddIcon />
+                    <AddIcon  fontSize="small"/>
                 </Button>
                 <Button
                     sx={{
@@ -79,7 +81,7 @@ function SecurityGroupViewContent(){
                         backgroundColor: '#1976d2',  // 클릭 시 배경색
                         },
                     }}>
-                    <RemoveIcon />
+                    <RemoveIcon  fontSize="small"/>
                 </Button>
                 </Box>   
                 <Paper style={{ width: 200, 
@@ -139,10 +141,10 @@ function SecurityGroupViewContent(){
                     }} >
                     <div className={styles.checkboxSearchStack} >
                         <Typography
-                           variant="h6"
-                           sx={{ mt: 3, mb: 5, fontWeight: 'bold'
+                           variant="body1"
+                           sx={{ mt: 5, mb: 5, fontWeight: 'bold'
                                 }}
-                        >관리자
+                        >{t('common.administrator')}
                         </Typography>   
                     </div>
                 </Toolbar>   
@@ -162,7 +164,7 @@ function SecurityGroupViewContent(){
                         backgroundColor: '#1976d2',  // 클릭 시 배경색
                         },
                     }}>
-                    <AddIcon />
+                    <AddIcon  fontSize="small"/>
                 </Button>
                 <Button
                     sx={{
@@ -178,7 +180,7 @@ function SecurityGroupViewContent(){
                         backgroundColor: '#1976d2',  // 클릭 시 배경색
                         },
                     }}>
-                    <RemoveIcon />
+                    <RemoveIcon  fontSize="small"/>
                 </Button>
                 </Box>
                 <Paper style={{ width: 200, 
@@ -235,10 +237,10 @@ function SecurityGroupViewContent(){
                     }} >
                     <div className={styles.checkboxSearchStack} >
                         <Typography
-                            variant="h6"
-                            sx={{ mt: 3, mb: 5, fontWeight: 'bold'
+                            variant="body1"
+                            sx={{ mt: 5, mb: 5, fontWeight: 'bold'
                                 }}
-                        >부서
+                        >{t('common.dept')}
                         </Typography>   
                     </div>
                 </Toolbar>
@@ -257,7 +259,7 @@ function SecurityGroupViewContent(){
                         backgroundColor: '#1976d2',  // 클릭 시 배경색
                         },
                     }}>
-                    <AddIcon />
+                    <AddIcon  fontSize="small"/>
                 </Button>
                 <Button
                     sx={{
@@ -273,7 +275,7 @@ function SecurityGroupViewContent(){
                         backgroundColor: '#1976d2',  // 클릭 시 배경색
                         },
                     }}>
-                    <RemoveIcon />
+                    <RemoveIcon  fontSize="small"/>
                 </Button>
                 </Box>
                 <Paper style={{ width: 200, 

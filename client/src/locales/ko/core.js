@@ -34,6 +34,9 @@ const core = {
       modify_user:'최근 수정자' ,
       regex_modify:'정규식 수정',
       regex_add:'정규식 추가',
+      security_group: '보안그룹',
+      dept:'부서',
+      administrator : '관리자'
     },
     action:{
       Login: '로그인',

@@ -125,9 +125,20 @@ app.get('/', (req, res)=>{
 app.post('/login', async(req, res) => {
     const {username, password} = req.body;
     try{
+
+        
         const users = await pool.query('SELECT user_id, user_name, password FROM tbl_user WHERE user_name = $1', [username]);
         if(!users.rows.length) return res.json({message:'Invalid userName or password'});
    
+        // security_group_admin 있는 사람만 로그인 
+        const exist_secu_group = await pool.query(`select security_group_name 
+        from tbl_security_group_admin
+        where security_group_admin_name = $1
+        and security_group_admin_start_date <= CURRENT_DATE
+        and (security_group_admin_end_date is null or security_group_admin_end_date >= CURRENT_DATE)`, [username]);
+
+        if(!exist_secu_group.rows.length) return res.json({message:'No Security Admin'});
+
 
         // alogrithm 
         const algorithm = process.env.CRYPTO_ALGORITHM;
@@ -493,14 +504,50 @@ app.post('/modifyPersonalRegEx', async(req,res) => {
 });
 
 //보안그룹 쿼리 
-app.get('/getSecurityGroup', async(req, res) => {
+app.post('/getSecurityGroup', async(req, res) => {
+    const { 
+        username } = req.body;
     try{
-        const personalRegEx = await pool.query(` 
-            select id as "regExId",
-            regex_name as "RegexName",
-            regex_value as "RegexValue"
-            from tbl_personal_info_regex`);
-        res.json(personalRegEx.rows);
+
+        const securityGroup = await pool.query(` 
+                select security_group_name 
+                from tbl_security_group_admin
+                where security_group_admin_name = $1
+                and security_group_admin_start_date <= CURRENT_DATE
+                and (security_group_admin_end_date is null or security_group_admin_end_date >= CURRENT_DATE)`,[username]);
+
+        if (securityGroup.rows.some(row => row.security_group_name === 'ADMIN')) {
+            // security_group_name이 'ADMIN'인 경우: username에 상관없이 모든 데이터를 조회
+            const allData = await pool.query(`
+                select security_group_name
+                from tbl_security_group_admin
+                where security_group_admin_start_date <= CURRENT_DATE
+                and (security_group_admin_end_date is null or security_group_admin_end_date >= CURRENT_DATE)
+            `);
+            res.json(allData.rows);
+        }else{
+            res.json(securityGroup.rows);
+        }        
+        res.end();
+    }catch(err){
+        console.log(err);
+        res.json({message:err});        
+        res.end();
+    }
+});
+
+//보안그룹 admin 쿼리 
+app.post('/getSecurityGroupAdmin', async(req, res) => {
+    const { 
+        username } = req.body;
+    try{
+        const securityGroup = await pool.query(` 
+                select security_group_name 
+                from tbl_security_group_admin
+                where security_group_admin_name = $1
+                and security_group_admin_start_date <= CURRENT_DATE
+                and (security_group_admin_end_date is null or security_group_admin_end_date >= CURRENT_DATE)`,[username]);
+        res.json(securityGroup.rows);
         res.end();
     }catch(err){
         console.log(err);
