@@ -1,5 +1,5 @@
 import { selector } from 'recoil';
-import { atomsSecurityGroupData, atomsSecurityGroupAdminData, ISecuQueryCondi } from "../atoms/atomsSecurityGroup";
+import { atomsSecurityGroupData, atomsSecurityGroupAdminData,atomsSecurityGroupDeptData, ISecuQueryCondi } from "../atoms/atomsSecurityGroup";
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
@@ -28,7 +28,6 @@ export const SecurityGroupRepository = selector({
 
         const loadSecurityGroupAdmin = getCallback(({set}) => async (data:ISecuQueryCondi) => {
             try{
-                console.log('loadSecurityGroupAdmin', data);
                 const response = await fetch(`${BASE_PATH}/getSecurityGroupAdmin`,{
                     method: "POST", 
                     headers:{'Content-Type':'application/json'},
@@ -46,11 +45,30 @@ export const SecurityGroupRepository = selector({
             }
         });
 
-       
+        const loadSecurityGroupDept = getCallback(({set}) => async (data:ISecuQueryCondi) => {
+            try{
+                console.log('loadSecurityGroupDept', data);
+                const response = await fetch(`${BASE_PATH}/getSecurityGroupDept`,{
+                    method: "POST", 
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify(data)
+                   }); 
+                const json = await response.json();
+                if(json.message) {
+                    console.log('loadSecurityGroupDept: ', json.message);
+                } else {
+                    set(atomsSecurityGroupDeptData, json);
+                }
+            }catch(err){
+                console.error(err);
+                set(atomsSecurityGroupDeptData, []);
+            }
+        });
 
         return {
             loadSecurityGroup,
             loadSecurityGroupAdmin,
+            loadSecurityGroupDept,
         };
     },
 });

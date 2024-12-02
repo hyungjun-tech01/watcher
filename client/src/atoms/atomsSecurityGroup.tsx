@@ -18,18 +18,29 @@ export interface ISecurityGroupAdmin{
     department : string;
 }
 
+export interface ISecurityGroupDept{
+    security_group_name: string;
+    dept_id : string;
+    dept_name : string; 
+}
+
 export interface ISecuQueryCondi{
     username : string|null; 
     security_group_name : string|null;
 }
 
 export const atomsSecurityGroupData = atom<ISecurityGroup[]>({
-  key: 'regSecurityGroupData',
+  key: 'SecurityGroupData',
   default: []
 });
 
 export const atomsSecurityGroupAdminData = atom<ISecurityGroupAdmin[]>({
-    key: 'regSecurityGroupAdminData',
+    key: 'SecurityGroupAdminData',
+    default: []
+});
+
+export const atomsSecurityGroupDeptData = atom<ISecurityGroupDept[]>({
+    key: 'SecurityGroupDeptData',
     default: []
 });
 

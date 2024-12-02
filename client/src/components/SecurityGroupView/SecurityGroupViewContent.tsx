@@ -5,7 +5,8 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
 import styles from "./SecurityGroupViewContent.module.scss";
 import { SecurityGroupRepository } from '../../repository/securityGroupRepository';
-import { atomsSecurityGroupData, atomsSecurityGroupAdminData, ISecurityGroup, ISecurityGroupAdmin } from '../../atoms/atomsSecurityGroup';
+import { atomsSecurityGroupData, atomsSecurityGroupAdminData, atomsSecurityGroupDeptData, 
+         ISecurityGroup, ISecurityGroupAdmin, ISecurityGroupDept } from '../../atoms/atomsSecurityGroup';
 import { useRecoilValue } from 'recoil';
 import {useCookies} from "react-cookie";
 
@@ -15,12 +16,14 @@ function SecurityGroupViewContent(){
     const [t] = useTranslation();
     const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
     const [selectedAdmin, setSelectedAdmin] = useState<string | null>(null);
-    const { loadSecurityGroup, loadSecurityGroupAdmin } = useRecoilValue(SecurityGroupRepository);
+    const [selectedDept, setSelectedDept] = useState<string | null>(null);
+    const { loadSecurityGroup, loadSecurityGroupAdmin, loadSecurityGroupDept } = useRecoilValue(SecurityGroupRepository);
     const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
     const [executeQuery, setExecuteQuery] = useState(true);
     const [executeAdminQuery, setExecuteAdminQuery]  = useState(true);
     const securityGroupData = useRecoilValue(atomsSecurityGroupData);
     const securityGroupAdminData = useRecoilValue(atomsSecurityGroupAdminData);
+    const securityGroupDeptData = useRecoilValue(atomsSecurityGroupDeptData);
 
 
     const options = ["일반","내부감사"];
@@ -34,12 +37,13 @@ function SecurityGroupViewContent(){
       
       const data = {username : cookies.WatcherWebUserName, security_group_name:option.security_group_name};
       loadSecurityGroupAdmin(data);
+      loadSecurityGroupDept(data);    
     };    
     const handleSelectManager = (option:ISecurityGroupAdmin) =>{
         setSelectedAdmin(option.security_group_admin_name);
     }
-    const handleSelectDept = (option:string) =>{
-
+    const handleSelectDept = (option:ISecurityGroupDept) =>{
+        setSelectedDept(option.dept_id);
     }
 
     const querySecurityGroup = useCallback(()=>{
@@ -335,13 +339,13 @@ function SecurityGroupViewContent(){
                         minHeight:200,
                     }}  
                 >
-                    {dept.map((option) => (
-                    <ListItem key={option} disablePadding>
+                    {securityGroupDeptData.map((option) => (
+                    <ListItem key={option.dept_id} disablePadding>
                         <ListItemButton
-                        selected={selectedInterest === option}
+                        selected={selectedInterest === option.dept_id}
                         onClick={() => handleSelectDept(option)}
                         sx={{
-                            bgcolor: selectedInterest === option ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
+                            bgcolor: selectedInterest === option.dept_id ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
                             '&.Mui-selected': {
                             bgcolor: '#1976d2', // 선택 상태일 때 배경색
                             },
@@ -353,7 +357,7 @@ function SecurityGroupViewContent(){
                             },
                         }}
                         >
-                        <ListItemText primary={option} />
+                        <ListItemText primary={option.dept_name} />
                         </ListItemButton>
                     </ListItem>
                     ))}
