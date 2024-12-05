@@ -10,6 +10,8 @@ import { atomsSecurityGroupData, atomsSecurityGroupAdminData, atomsSecurityGroup
 import { useRecoilValue } from 'recoil';
 import {useCookies} from "react-cookie";
 
+import AddSecurityGroup from './AddSecurityGroup';
+
 
 
 function SecurityGroupViewContent(){
@@ -25,13 +27,24 @@ function SecurityGroupViewContent(){
     const securityGroupAdminData = useRecoilValue(atomsSecurityGroupAdminData);
     const securityGroupDeptData = useRecoilValue(atomsSecurityGroupDeptData);
 
+    const [addSecurityGroup, setAddSecurityGroup] = React.useState(false);
 
-    const options = ["일반","내부감사"];
-
-    const manager = ["정낙준","홍길동"];
-
-    const dept = ["인사부","감사실"];
+    const handleClickAddSecurityOpen= () => {
+        const usernameInput = document.getElementById("username") as HTMLInputElement;
+        if (usernameInput) {
+          usernameInput.value = ""; // 값 초기화
+        }
+        const passwordInput = document.getElementById("password") as HTMLInputElement;
+        if (passwordInput) {
+          passwordInput.value = ""; // 값 초기화
+        }
+        setAddSecurityGroup(true);
+      };
   
+      const handleClickAddSecurityClose= () => {
+        setAddSecurityGroup(false);
+      };  
+
     const handleSelect = (option: ISecurityGroup) => {
       setSelectedInterest(option.security_group_name);
       
@@ -96,7 +109,7 @@ function SecurityGroupViewContent(){
                     </div>
                 </Toolbar>
                 <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' , mb:0.5}}>
-                <Button
+                <Button  onClick={handleClickAddSecurityOpen}
                     sx={{
                         minWidth: 0,  // 버튼의 최소 너비를 없애 아이콘만 보이게
                         padding: 1,   // 버튼 내부 여백
@@ -365,6 +378,7 @@ function SecurityGroupViewContent(){
                 </Paper>
             </div >            
         </Box>
+        <AddSecurityGroup open={addSecurityGroup} handleClose={handleClickAddSecurityClose} />
         </div>
     );
 

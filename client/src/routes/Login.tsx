@@ -212,7 +212,7 @@ const Login = () => {
             >
               {t("action.Login")}
             </Button>
-            {/* 비밀번호 잊어 버렸을 떄 Proces 막음 
+           {/* 비밀번호 잊어 버렸을 떄 Proces 막음 */}
             <Grid container  justifyContent="center">
               <Box
                 sx={{
@@ -234,7 +234,7 @@ const Login = () => {
                   </Typography>
                 </Link>  
               </Box>
-            </Grid> */}
+            </Grid>
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
