@@ -18,6 +18,11 @@ export interface ISecurityGroupAdmin{
     department : string;
 }
 
+export interface IUser{
+    user_name : string;
+    full_name : string;
+    department : string;
+}
 export interface ISecurityGroupDept{
     security_group_name: string;
     dept_id : string;
@@ -41,6 +46,11 @@ export const atomsSecurityGroupAdminData = atom<ISecurityGroupAdmin[]>({
 
 export const atomsSecurityGroupDeptData = atom<ISecurityGroupDept[]>({
     key: 'SecurityGroupDeptData',
+    default: []
+});
+
+export const atomsUserData = atom<IUser[]>({
+    key: 'User',
     default: []
 });
 

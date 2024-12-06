@@ -35,6 +35,8 @@ const core = {
       administrator : 'Administrator',
       security_group_name :'Security Group Name',
       add_security_group :'Add Security Group',
+      add_security_admin :'Add Administrator',
+      security_admin_name :'Security Admin Name',
       security_group_memo:'Memo',
       add_security_dept : 'Add Department',
       add_security_group_name :'Register a security group. Only security group ADMIN administrator can work.',
@@ -43,7 +45,11 @@ const core = {
       exist_security_admin : 'Security group administrator exists. Delete it first.',
       exists_security_dept : 'Security group department exists. Delete it first.',
       no_select_security_group :'First, Select security group.',
-      duplicate_security_group_dept : 'Aleady exists department.'
+      duplicate_security_group_dept : 'Aleady exists department.',
+      add_security_admin_text : 'Add administrators who can view documents within the security group',
+      please_select:'Please Select',
+      duplicate_security_group_admin:'It is already an administrator in that security group.',
+      newpassword_missmatch : 'The new passwords do not match.',
     },
 
     action: {

@@ -11,6 +11,7 @@ import { useRecoilValue } from 'recoil';
 import {useCookies} from "react-cookie";
 
 import AddSecurityGroup from './AddSecurityGroup';
+import AddSecurityAdmin from './AddSecurityAdmin';
 import AddSecurityDept from './AddSecurityDept';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
@@ -69,7 +70,8 @@ function SecurityGroupViewContent(){
     const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
     const [selectedAdmin, setSelectedAdmin] = useState<string | null>(null);
     const [selectedDept, setSelectedDept] = useState<string | null>(null);
-    const { loadSecurityGroup, loadSecurityGroupAdmin, loadSecurityGroupDept, modifySecurityGroup, modifySecurityGroupDept } = useRecoilValue(SecurityGroupRepository);
+    const { loadSecurityGroup, loadSecurityGroupAdmin, loadSecurityGroupDept, 
+            modifySecurityGroup, modifySecurityGroupDept , modifySecurityGroupAdmin} = useRecoilValue(SecurityGroupRepository);
     const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
     const [executeQuery, setExecuteQuery] = useState(true);
     const [executeAdminQuery, setExecuteAdminQuery]  = useState(true);
@@ -80,6 +82,7 @@ function SecurityGroupViewContent(){
     const [error, setError] = useState<IError>(initErrorContent);   
 
     const [addSecurityGroup, setAddSecurityGroup] = useState(false);
+    const [addSecurityAdmin, setAddSecurityAdmin] = useState(false);
     const [addSecurityDept, setAddSecurityDept] = useState(false);
 
     const handleClickAddSecurityOpen= () => {
@@ -115,6 +118,23 @@ function SecurityGroupViewContent(){
       const handleClickAddSecurityDeptClose= () => {
         setAddSecurityDept(false);
       };       
+
+      const handleClickAddSecurityAdminOpen= () => {
+        setError(initErrorContent);
+        if(!selectedInterest){
+            const checkSecurityGroup: IError = { message: "", type: "warning", content: "common.no_select_security_group" };
+            setError(checkSecurityGroup);
+            return;
+        }
+        const adminnameInput = document.getElementById("security_admin_name") as HTMLInputElement;
+        if (adminnameInput) {
+            adminnameInput.value = ""; // 값 초기화
+        }
+        setAddSecurityAdmin(true);
+      };      
+      const handleClickAddSecurityAdminClose= () => {
+        setAddSecurityAdmin(false);
+      };    
 
     const handleSelect = (option: ISecurityGroup) => {
       setError(initErrorContent);
@@ -156,9 +176,9 @@ function SecurityGroupViewContent(){
         querySecurityGroupAdmin();
         setExecuteQuery(!executeQuery);
         setExecuteAdminQuery(!executeAdminQuery);
-      }, []);
+    }, []);
 
-      const deleteSecurityGroup =  () => {
+    const deleteSecurityGroup =  () => {
            setError(initErrorContent);
            const _data = {
             action_type : 'DELETE',
@@ -167,8 +187,8 @@ function SecurityGroupViewContent(){
           };
           console.log(_data);
           onDeleteSecurityGroup(_data);
-        };
-      const onDeleteSecurityGroup = async (data: any) => {
+    };
+    const onDeleteSecurityGroup = async (data: any) => {
         setIsSubmitting(true);
         console.log(`[ newSecurityGroup ]`, data);
         const response = await modifySecurityGroup(data);
@@ -179,9 +199,9 @@ function SecurityGroupViewContent(){
           setError(createMessage(response));
         }
         setIsSubmitting(false);
-      };      
+    };      
       
-      const deleteSecurityGroupDept =  () => {
+    const deleteSecurityGroupDept =  () => {
         setError(initErrorContent);
         const _data = {
          action_type : 'DELETE',
@@ -190,12 +210,10 @@ function SecurityGroupViewContent(){
        };
        console.log(_data);
        onDeleteSecurityGroupDept(_data);
-     };
-   const onDeleteSecurityGroupDept = async (data: any) => {
+    };
+    const onDeleteSecurityGroupDept = async (data: any) => {
      setIsSubmitting(true);
-     console.log(`[ newSecurityGroup ]`, data);
      const response = await modifySecurityGroupDept(data);
-     console.log('addSecurityGroup', response);
      if (response.message === 'success') {
         const data = {username : cookies.WatcherWebUserName, security_group_name:selectedInterest};
         loadSecurityGroupDept(data);   
@@ -203,7 +221,28 @@ function SecurityGroupViewContent(){
        setError(createMessage(response));
      }
      setIsSubmitting(false);
-   };         
+    };
+   
+    const deleteSecurityGroupAdmin =  () => {
+      setError(initErrorContent);
+      const _data = {
+        action_type : 'DELETE',
+        security_group_name: selectedInterest,
+        security_admin_name : selectedAdmin,
+      };
+      onDeleteSecurityGroupAdmin(_data);
+    };
+    const onDeleteSecurityGroupAdmin = async (data: any) => {
+      setIsSubmitting(true);
+      const response = await modifySecurityGroupAdmin(data);
+      if (response.message === 'success') {
+          const data = {username : cookies.WatcherWebUserName, security_group_name:selectedInterest};
+          loadSecurityGroupAdmin(data);   
+      } else {
+        setError(createMessage(response));
+      }
+      setIsSubmitting(false);
+    };        
 
     return(
         <div className={styles.content} >
@@ -356,7 +395,7 @@ function SecurityGroupViewContent(){
                 </Toolbar>   
                 
                 <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' , mb:0.5}}>
-                <Button
+                <Button onClick={handleClickAddSecurityAdminOpen}
                     sx={{
                         minWidth: 0,  // 버튼의 최소 너비를 없애 아이콘만 보이게
                         padding: 1,   // 버튼 내부 여백
@@ -372,7 +411,7 @@ function SecurityGroupViewContent(){
                     }}>
                     <AddIcon  fontSize="small"/>
                 </Button>
-                <Button
+                <Button onClick={deleteSecurityGroupAdmin}
                     sx={{
                         minWidth: 0,  // 버튼의 최소 너비를 없애 아이콘만 보이게
                         padding: 1,   // 버튼 내부 여백
@@ -407,10 +446,10 @@ function SecurityGroupViewContent(){
                     {securityGroupAdminData.map((option) => (
                     <ListItem key={option.security_group_admin_name} disablePadding>
                         <ListItemButton
-                        selected={selectedInterest === option.security_group_admin_name}
+                        selected={selectedAdmin === option.security_group_admin_name}
                         onClick={() => handleSelectManager(option)}
                         sx={{
-                            bgcolor: selectedInterest === option.security_group_admin_name ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
+                            bgcolor: selectedAdmin === option.security_group_admin_name ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
                             '&.Mui-selected': {
                             bgcolor: '#1976d2', // 선택 상태일 때 배경색
                             },
@@ -535,6 +574,7 @@ function SecurityGroupViewContent(){
             </Typography>   
         </div>
         <AddSecurityGroup open={addSecurityGroup} handleClose={handleClickAddSecurityClose} querySecurityGroup={querySecurityGroup} />
+        <AddSecurityAdmin open={addSecurityAdmin} securityGroupName={selectedInterest} handleClose={handleClickAddSecurityAdminClose} loadSecurityGroupAdmin={loadSecurityGroupAdmin} />
         <AddSecurityDept open={addSecurityDept} securityGroupName={selectedInterest} handleClose={handleClickAddSecurityDeptClose} loadSecurityGroupDept={loadSecurityGroupDept} />
         </div>
     );

@@ -86,7 +86,6 @@ function AddSecurityDept({ open, securityGroupName, handleClose, loadSecurityGro
       );
       const onValid = async (data: any) => {
         setIsSubmitting(true);
-        console.log(data);
         const response = await modifySecurityGroupDept(data);
         if (response.message === 'success') {
 

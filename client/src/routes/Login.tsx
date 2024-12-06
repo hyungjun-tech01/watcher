@@ -20,6 +20,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Path from "../constants/Paths";
 import ForgotPassword from './ForgotPassword';
+import ChangePassword from './ChangePassword';
 
 const Copyright = (props: any) => {
   return (
@@ -95,6 +96,7 @@ const Login = () => {
   const [loginError, setLoginError] = useState<IError>(initErrorContent);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [forgotPassword, setForgotPassword] = React.useState(false);
+  const [changePassword, setChangePassword] = React.useState(false);
 
   const handleClickForgotPasswordOpen= () => {
     const usernameInput = document.getElementById("username") as HTMLInputElement;
@@ -110,6 +112,31 @@ const Login = () => {
   const handleClickForgotPasswordClose= () => {
     setForgotPassword(false);
   };  
+
+  const handleClickChangePasswordOpen= () => {
+    const usernameInput = document.getElementById("username") as HTMLInputElement;
+    if (usernameInput) {
+      usernameInput.value = ""; // 값 초기화
+    }
+    const oldPasswordInput = document.getElementById("old_password") as HTMLInputElement;
+    if (oldPasswordInput) {
+      oldPasswordInput.value = ""; // 값 초기화
+    }
+    const newPasswordInput1 = document.getElementById("new_password1") as HTMLInputElement;
+    if (newPasswordInput1) {
+      newPasswordInput1.value = ""; // 값 초기화
+    }
+    const newPasswordInput2 = document.getElementById("new_password2") as HTMLInputElement;
+    if (newPasswordInput2) {
+      newPasswordInput2.value = ""; // 값 초기화
+    }
+    setChangePassword(true);
+  };
+  const handleClickChangePasswordClose= () => {
+    setChangePassword(false);
+  };  
+
+  
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -212,8 +239,8 @@ const Login = () => {
             >
               {t("action.Login")}
             </Button>
-           {/* 비밀번호 잊어 버렸을 떄 Proces 막음 */}
-            <Grid container  justifyContent="center">
+           {/* 비밀번호 분실 할 때  */}
+            {/* <Grid container  justifyContent="center">
               <Box
                 sx={{
                   display: 'flex',
@@ -234,12 +261,36 @@ const Login = () => {
                   </Typography>
                 </Link>  
               </Box>
+            </Grid> */}
+             {/* 비밀번호 변경 할 때  */}
+            <Grid container  justifyContent="center">
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                }}
+              >
+                <Link
+                  component="button"
+                  type="button"
+                  onClick={handleClickChangePasswordOpen}
+                  variant="body2"
+                  sx={{ alignSelf: 'center' }}
+                >
+                  <Typography variant="body1" component="label" htmlFor="forgotUserPassword" sx={{ minWidth: 90, whiteSpace: 'nowrap' }}>
+                    {t('common.changePassword')}
+                  </Typography>
+                </Link>  
+              </Box>
             </Grid>
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
       <ForgotPassword open={forgotPassword} handleClose={handleClickForgotPasswordClose} />
+      <ChangePassword open={changePassword} handleClose={handleClickChangePasswordClose} />
     </ThemeProvider>
   );
 };

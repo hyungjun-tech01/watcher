@@ -20,6 +20,9 @@ const login = {
       forgotUserPassword :'Forgot username or password?',
       resetPassword :'Reset Password',
       resetPasswordText : 'Enter your account&apos;s email address, and we&apos;ll send you a link to reset your password.',
+      resetPasswordText : 'Change New Password',
+      changePassword :'Change Password',
+      invalid_userName:'Invalid username',
     },
 
     action: {
