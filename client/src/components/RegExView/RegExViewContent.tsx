@@ -73,7 +73,7 @@ function RegExViewContent() {
                         }}
                 >추가
                 </Button>
-        </div>
+              </div>
             </Toolbar>
             <Paper elevation={3} sx={{ m: 2  }}>
                 <RegExTable

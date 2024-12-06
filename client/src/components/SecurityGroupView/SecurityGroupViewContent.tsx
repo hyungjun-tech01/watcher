@@ -11,7 +11,57 @@ import { useRecoilValue } from 'recoil';
 import {useCookies} from "react-cookie";
 
 import AddSecurityGroup from './AddSecurityGroup';
+import AddSecurityDept from './AddSecurityDept';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+
+const createMessage = (error: IError) => {
+    if (!error) {
+      return error;
+    }
+    console.log('error',error.message);
+
+    switch (error.message) {
+      case "Not Admin":
+        return {
+            ...error,
+            type: "warning",
+            content: "common.only_security_group_admin",
+        };   
+      case "exists Security Group Admin":
+        return {
+          ...error,
+          type: "error",
+          content: "common.exist_security_admin",
+        };
+      case "exists Security Group Dept":
+        return {
+          ...error,
+          type: "warning",
+          content: "common.exists_security_dept",
+        };
+      case "No Select Security Group":
+        return {
+              ...error,
+              type: "warning",
+              content: "common.no_select_security_group",
+        };        
+      default:
+        return {
+              ...error,
+              type: "warning",
+              content: "common.unknownError",
+        };    
+    }
+  };
+  
+  interface IError {
+    message: string;
+    type: string;
+    content: string;
+  }
+  
+  const initErrorContent: IError = { message: "", type: "", content: "" };
 
 
 function SecurityGroupViewContent(){
@@ -19,17 +69,21 @@ function SecurityGroupViewContent(){
     const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
     const [selectedAdmin, setSelectedAdmin] = useState<string | null>(null);
     const [selectedDept, setSelectedDept] = useState<string | null>(null);
-    const { loadSecurityGroup, loadSecurityGroupAdmin, loadSecurityGroupDept } = useRecoilValue(SecurityGroupRepository);
+    const { loadSecurityGroup, loadSecurityGroupAdmin, loadSecurityGroupDept, modifySecurityGroup, modifySecurityGroupDept } = useRecoilValue(SecurityGroupRepository);
     const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
     const [executeQuery, setExecuteQuery] = useState(true);
     const [executeAdminQuery, setExecuteAdminQuery]  = useState(true);
     const securityGroupData = useRecoilValue(atomsSecurityGroupData);
     const securityGroupAdminData = useRecoilValue(atomsSecurityGroupAdminData);
     const securityGroupDeptData = useRecoilValue(atomsSecurityGroupDeptData);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<IError>(initErrorContent);   
 
-    const [addSecurityGroup, setAddSecurityGroup] = React.useState(false);
+    const [addSecurityGroup, setAddSecurityGroup] = useState(false);
+    const [addSecurityDept, setAddSecurityDept] = useState(false);
 
     const handleClickAddSecurityOpen= () => {
+        setError(initErrorContent);
         const usernameInput = document.getElementById("username") as HTMLInputElement;
         if (usernameInput) {
           usernameInput.value = ""; // 값 초기화
@@ -45,7 +99,25 @@ function SecurityGroupViewContent(){
         setAddSecurityGroup(false);
       };  
 
+      const handleClickAddSecurityDeptOpen= () => {
+        setError(initErrorContent);
+        if(!selectedInterest){
+            const checkSecurityGroup: IError = { message: "", type: "warning", content: "common.no_select_security_group" };
+            setError(checkSecurityGroup);
+            return;
+        }
+        const deptnameInput = document.getElementById("security_dept_name") as HTMLInputElement;
+        if (deptnameInput) {
+            deptnameInput.value = ""; // 값 초기화
+        }
+        setAddSecurityDept(true);
+      };      
+      const handleClickAddSecurityDeptClose= () => {
+        setAddSecurityDept(false);
+      };       
+
     const handleSelect = (option: ISecurityGroup) => {
+      setError(initErrorContent);
       setSelectedInterest(option.security_group_name);
       
       const data = {username : cookies.WatcherWebUserName, security_group_name:option.security_group_name};
@@ -53,21 +125,30 @@ function SecurityGroupViewContent(){
       loadSecurityGroupDept(data);    
     };    
     const handleSelectManager = (option:ISecurityGroupAdmin) =>{
+        setError(initErrorContent);
         setSelectedAdmin(option.security_group_admin_name);
     }
     const handleSelectDept = (option:ISecurityGroupDept) =>{
-        setSelectedDept(option.dept_id);
+        setError(initErrorContent);
+        setSelectedDept(option.dept_name);
     }
 
     const querySecurityGroup = useCallback(()=>{
+        setError(initErrorContent);
         const data = {username : cookies.WatcherWebUserName, security_group_name:''};
         loadSecurityGroup(data);
+        setSelectedInterest(null);
+        loadSecurityGroupAdmin(data);
+        setSelectedAdmin(null);
+        loadSecurityGroupDept(data);
+        setSelectedDept(null);
     }, [executeQuery]);    
 
     const querySecurityGroupAdmin = useCallback(()=>{
+        setError(initErrorContent);
         const data = {username : cookies.WatcherWebUserName, security_group_name:selectedInterest};
-        console.log('execute_querySecurityGroupAdmin');
         loadSecurityGroupAdmin(data);
+        setSelectedAdmin(null);
     }, [executeAdminQuery]);    
 
     useEffect(() => {
@@ -77,9 +158,76 @@ function SecurityGroupViewContent(){
         setExecuteAdminQuery(!executeAdminQuery);
       }, []);
 
+      const deleteSecurityGroup =  () => {
+           setError(initErrorContent);
+           const _data = {
+            action_type : 'DELETE',
+            security_group_name: selectedInterest,
+            modify_user : cookies.WatcherWebUserId,
+          };
+          console.log(_data);
+          onDeleteSecurityGroup(_data);
+        };
+      const onDeleteSecurityGroup = async (data: any) => {
+        setIsSubmitting(true);
+        console.log(`[ newSecurityGroup ]`, data);
+        const response = await modifySecurityGroup(data);
+        console.log('addSecurityGroup', response);
+        if (response.message === 'success') {
+            querySecurityGroup();   
+        } else {
+          setError(createMessage(response));
+        }
+        setIsSubmitting(false);
+      };      
+      
+      const deleteSecurityGroupDept =  () => {
+        setError(initErrorContent);
+        const _data = {
+         action_type : 'DELETE',
+         security_group_name: selectedInterest,
+         security_dept_name : selectedDept,
+       };
+       console.log(_data);
+       onDeleteSecurityGroupDept(_data);
+     };
+   const onDeleteSecurityGroupDept = async (data: any) => {
+     setIsSubmitting(true);
+     console.log(`[ newSecurityGroup ]`, data);
+     const response = await modifySecurityGroupDept(data);
+     console.log('addSecurityGroup', response);
+     if (response.message === 'success') {
+        const data = {username : cookies.WatcherWebUserName, security_group_name:selectedInterest};
+        loadSecurityGroupDept(data);   
+     } else {
+       setError(createMessage(response));
+     }
+     setIsSubmitting(false);
+   };         
+
     return(
         <div className={styles.content} >
-                    
+            <Toolbar sx={{height: 40, 
+                          minHeight:40,   
+                          flexGrow: 1,  
+                          justifyContent: "flex-end", 
+                         '@media (min-width: 600px)': {
+                            minHeight: 40, // This ensures the minHeight is 40px even for larger screens
+                          },  
+                        }} >
+                <div className={styles.checkboxSearchStack} >
+                <Button
+                    type="submit"
+                    variant="contained"
+                    onClick={querySecurityGroup}
+                    sx={{ mt: 3, mb: 2 , 
+                        backgroundColor:"rgba(25,137,43,255)",
+                        ":hover": { backgroundColor: "rgba(13,118,33,255)" }
+                        }}
+                >새로고침
+                </Button>
+              </div>
+            </Toolbar>                    
         <Box sx={{ width: '100%', 
             display: 'flex', // 수평 배치 설정
             // justifyContent: 'space-between', // 두 컴포넌트 사이에 공간을 배분
@@ -125,7 +273,7 @@ function SecurityGroupViewContent(){
                     }}>
                     <AddIcon  fontSize="small"/>
                 </Button>
-                <Button
+                <Button  onClick={deleteSecurityGroup}
                     sx={{
                         minWidth: 0,  // 버튼의 최소 너비를 없애 아이콘만 보이게
                         padding: 1,   // 버튼 내부 여백
@@ -274,7 +422,7 @@ function SecurityGroupViewContent(){
                             },
                         }}
                         >
-                        <ListItemText primary={option.full_name} />
+                        <ListItemText primary={option.full_name+'('+option.department+')'} />
                         </ListItemButton>
                     </ListItem>
                     ))}
@@ -303,7 +451,7 @@ function SecurityGroupViewContent(){
                     </div>
                 </Toolbar>
                 <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' , mb:0.5}}>
-                <Button
+                <Button onClick={handleClickAddSecurityDeptOpen}
                     sx={{
                         minWidth: 0,  // 버튼의 최소 너비를 없애 아이콘만 보이게
                         padding: 1,   // 버튼 내부 여백
@@ -319,7 +467,7 @@ function SecurityGroupViewContent(){
                     }}>
                     <AddIcon  fontSize="small"/>
                 </Button>
-                <Button
+                <Button onClick={deleteSecurityGroupDept}
                     sx={{
                         minWidth: 0,  // 버튼의 최소 너비를 없애 아이콘만 보이게
                         padding: 1,   // 버튼 내부 여백
@@ -355,10 +503,10 @@ function SecurityGroupViewContent(){
                     {securityGroupDeptData.map((option) => (
                     <ListItem key={option.dept_id} disablePadding>
                         <ListItemButton
-                        selected={selectedInterest === option.dept_id}
+                        selected={selectedDept === option.dept_name}
                         onClick={() => handleSelectDept(option)}
                         sx={{
-                            bgcolor: selectedInterest === option.dept_id ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
+                            bgcolor: selectedDept === option.dept_name ? '#1976d2' : 'transparent', // 선택된 항목만 파란색 배경
                             '&.Mui-selected': {
                             bgcolor: '#1976d2', // 선택 상태일 때 배경색
                             },
@@ -378,7 +526,16 @@ function SecurityGroupViewContent(){
                 </Paper>
             </div >            
         </Box>
-        <AddSecurityGroup open={addSecurityGroup} handleClose={handleClickAddSecurityClose} />
+        <div className={styles.checkboxSearchStack} >
+            <Typography
+                variant="body2"
+                sx={{ mt: 5, mb: 5, ml:2,
+                    }}
+            > {t(error.content)}
+            </Typography>   
+        </div>
+        <AddSecurityGroup open={addSecurityGroup} handleClose={handleClickAddSecurityClose} querySecurityGroup={querySecurityGroup} />
+        <AddSecurityDept open={addSecurityDept} securityGroupName={selectedInterest} handleClose={handleClickAddSecurityDeptClose} loadSecurityGroupDept={loadSecurityGroupDept} />
         </div>
     );
 

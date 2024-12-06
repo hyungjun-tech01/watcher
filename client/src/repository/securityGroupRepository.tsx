@@ -26,6 +26,24 @@ export const SecurityGroupRepository = selector({
             }
         });
 
+        const modifySecurityGroup = getCallback(({set, snapshot}) => async (newSecurityGroup) => {
+            const input_json = JSON.stringify(newSecurityGroup);
+            try{
+                const response = await fetch(`${BASE_PATH}/modifySecurityGroup`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+                const data = await response.json();
+                //loadAllRegex();  =>  로직 바깥에서 불러 줘야 함.
+                return(data);
+            }catch(err){
+                console.error(err);
+                return(err);
+               // set(atomsRegExData, []);
+            }
+        });
+
         const loadSecurityGroupAdmin = getCallback(({set}) => async (data:ISecuQueryCondi) => {
             try{
                 const response = await fetch(`${BASE_PATH}/getSecurityGroupAdmin`,{
@@ -65,10 +83,31 @@ export const SecurityGroupRepository = selector({
             }
         });
 
+        const modifySecurityGroupDept = getCallback(({set, snapshot}) => async (newSecurityGroup) => {
+            const input_json = JSON.stringify(newSecurityGroup);
+            console.log(`[ newSecurityGroup ] input : `, input_json);
+            try{
+                const response = await fetch(`${BASE_PATH}/modifySecurityGroupDept`, {
+                    method: "POST",
+                    headers:{'Content-Type':'application/json'},
+                    body: input_json,
+                });
+                const data = await response.json();
+                //loadAllRegex();  =>  로직 바깥에서 불러 줘야 함.
+                return(data);
+            }catch(err){
+                console.error(err);
+                return(err);
+               // set(atomsRegExData, []);
+            }
+        });        
+
         return {
             loadSecurityGroup,
             loadSecurityGroupAdmin,
             loadSecurityGroupDept,
+            modifySecurityGroup,
+            modifySecurityGroupDept,
         };
     },
 });

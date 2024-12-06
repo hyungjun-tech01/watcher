@@ -125,7 +125,6 @@ app.get('/', (req, res)=>{
 app.post('/login', async(req, res) => {
     const {username, password} = req.body;
     try{
-
         
         const users = await pool.query('SELECT user_id, user_name, password FROM tbl_user WHERE user_name = $1', [username]);
         if(!users.rows.length) return res.json({message:'Invalid userName or password'});
@@ -507,9 +506,7 @@ app.post('/modifyPersonalRegEx', async(req,res) => {
 app.post('/getSecurityGroup', async(req, res) => {
     const { 
         username } = req.body;
-    console.log('getSecurityGroup');
     try{
-        console.log('getSecurityGroup');
         const securityGroup = await pool.query(` 
         select b.security_group_id , b.security_group_name
         from tbl_security_group_admin a, tbl_security_group b
@@ -535,6 +532,75 @@ app.post('/getSecurityGroup', async(req, res) => {
         res.json({message:err});        
         res.end();
     }
+});
+
+app.post('/modifySecurityGroup', async(req, res) => {
+    const {
+        action_type, 
+        security_group_name,
+        security_group_memo,
+        modify_user } = req.body;
+    try{
+        const adminCheck = await pool.query(`SELECT security_group_name 
+                                                FROM tbl_security_group_admin 
+                                                WHERE security_group_admin_name = $1`, [modify_user]);
+
+        if (adminCheck.rows.some(row => row.security_group_name === 'ADMIN')) {
+        }else{
+            console.log('Not Admin');
+            return res.json({message:'Not Admin'});
+        }        
+
+        if(action_type === 'ADD'){
+
+            const dupCheck = await pool.query(`SELECT security_group_name 
+                                                FROM tbl_security_group 
+                                                WHERE security_group_name = $1`, [security_group_name]);
+            if(!dupCheck.rows.length){
+            }else{
+                return res.json({message:'Duplicate Security Group'});
+            }
+
+
+            const securityGroup = await pool.query(` 
+            insert into tbl_security_group( security_group_name, security_group_memo)
+            values( $1, $2)`,[security_group_name,security_group_memo ]);            
+        }
+        if(action_type === 'DELETE'){
+            // admin 과 dept가 존재하면 삭제 금지
+            const adminCheck = await pool.query(`SELECT security_group_name 
+                                                FROM tbl_security_group_admin a
+                                                WHERE security_group_name = $1
+                                                and a.security_group_admin_start_date <= CURRENT_DATE
+                                                and (a.security_group_admin_end_date is null or a.security_group_admin_end_date >= CURRENT_DATE)`, [security_group_name]);
+            if(!adminCheck.rows.length){
+            }else{
+                return res.json({message:'exists Security Group Admin'});
+            }
+
+            const deptCheck = await pool.query(`SELECT security_group_name 
+                                                    FROM tbl_dept_info 
+                                                    WHERE security_group_name = $1`, [security_group_name]);
+            if(!deptCheck.rows.length){
+            }else{
+            return res.json({message:'exists Security Group Dept'});
+            }
+
+            const securityGroup = await pool.query(` 
+                delete from tbl_security_group
+                where security_group_name = $1`,[security_group_name]);
+
+            // tbl_security_group_admin 도 함꼐 삭제 ...     
+        }
+
+        res.json({ message:'success' }); // 결과 리턴을 해 줌 .  
+
+    }catch(err){
+        console.log(err);
+        res.json({message:err});        
+        res.end();
+    }
+
 });
 
 //보안그룹 admin 쿼리 
@@ -575,6 +641,51 @@ app.post('/getSecurityGroupDept', async(req, res) => {
         res.json({message:err});        
         res.end();
     }
+});
+
+app.post('/modifySecurityGroupDept', async(req, res) => {
+    const {
+        action_type, 
+        security_group_name, 
+        security_dept_name,
+        modify_user } = req.body;
+
+    console.log('modifySecurityGroupDept',security_group_name, security_dept_name);    
+    try{
+           
+        if(action_type === 'ADD'){
+
+            const dupCheck = await pool.query(`SELECT security_group_name 
+                                                FROM tbl_dept_info 
+                                                WHERE security_group_name = $1
+                                                and dept_name = $2`, [security_group_name, security_dept_name]);
+            if(!dupCheck.rows.length){
+            }else{
+                return res.json({message:'Duplicate Security Group Dept'});
+            }
+
+
+            const securityGroup = await pool.query(` 
+            insert into tbl_dept_info( dept_id, dept_name, security_group_name)
+            values(  nextval(\'next_id_seq\') , $1, $2)`,[security_dept_name,security_group_name ]);            
+        }
+        if(action_type === 'DELETE'){
+            // admin 과 dept가 존재하면 삭제 금지
+           
+            const securityGroup = await pool.query(` 
+                delete from tbl_dept_info
+                where security_group_name = $1
+                and dept_name = $2`,[security_group_name, security_dept_name]);
+        }
+
+        res.json({ message:'success' }); // 결과 리턴을 해 줌 .  
+
+    }catch(err){
+        console.log(err);
+        res.json({message:err});        
+        res.end();
+    }
+
 });
 
 //signup 계정 생성 
@@ -671,7 +782,6 @@ app.get(`/${TextLog}/:year/:month/:fileName`, function(req, res) {
 // query personal info regex
 app.get('/getAllRegex', async(req, res) => {
     try{
-        console.log('getAllRegex');
         const auditJob = await pool.query(` 
             select regex_name ,
             regex_value ,

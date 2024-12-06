@@ -32,7 +32,18 @@ const core = {
       regex_add:'Reg Expression Add',         //
       security_group: 'Security Group',
       dept:'Department',
-      administrator : 'Administrator'
+      administrator : 'Administrator',
+      security_group_name :'Security Group Name',
+      add_security_group :'Add Security Group',
+      security_group_memo:'Memo',
+      add_security_dept : 'Add Department',
+      add_security_group_name :'Register a security group. Only security group ADMIN administrator can work.',
+      duplicate_security_group:'Duplicate security group name.',
+      only_security_group_admin:'Only security group ADMIN administrator can work.',
+      exist_security_admin : 'Security group administrator exists. Delete it first.',
+      exists_security_dept : 'Security group department exists. Delete it first.',
+      no_select_security_group :'First, Select security group.',
+      duplicate_security_group_dept : 'Aleady exists department.'
     },
 
     action: {

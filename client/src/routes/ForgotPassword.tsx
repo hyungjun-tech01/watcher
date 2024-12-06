@@ -1,19 +1,12 @@
 import React, {useState, useCallback } from "react";
 import {
-    Avatar,
     Box,
     Button,
-    Checkbox,
-    CssBaseline,
-    FormControlLabel,
-    Grid,
     TextField,
-    Typography,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogContentText,
-    OutlinedInput,
     DialogActions,
   } from "@mui/material";
 import { useTranslation } from "react-i18next";
