@@ -95,8 +95,8 @@ const Login = () => {
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState<IError>(initErrorContent);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [forgotPassword, setForgotPassword] = React.useState(false);
-  const [changePassword, setChangePassword] = React.useState(false);
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [changePassword, setChangePassword] = useState(false);
 
   const handleClickForgotPasswordOpen= () => {
     const usernameInput = document.getElementById("username") as HTMLInputElement;

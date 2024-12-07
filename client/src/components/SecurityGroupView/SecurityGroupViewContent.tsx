@@ -20,7 +20,6 @@ const createMessage = (error: IError) => {
     if (!error) {
       return error;
     }
-    console.log('error',error.message);
 
     switch (error.message) {
       case "Not Admin":
@@ -185,14 +184,11 @@ function SecurityGroupViewContent(){
             security_group_name: selectedInterest,
             modify_user : cookies.WatcherWebUserId,
           };
-          console.log(_data);
           onDeleteSecurityGroup(_data);
     };
     const onDeleteSecurityGroup = async (data: any) => {
         setIsSubmitting(true);
-        console.log(`[ newSecurityGroup ]`, data);
         const response = await modifySecurityGroup(data);
-        console.log('addSecurityGroup', response);
         if (response.message === 'success') {
             querySecurityGroup();   
         } else {
@@ -208,7 +204,6 @@ function SecurityGroupViewContent(){
          security_group_name: selectedInterest,
          security_dept_name : selectedDept,
        };
-       console.log(_data);
        onDeleteSecurityGroupDept(_data);
     };
     const onDeleteSecurityGroupDept = async (data: any) => {

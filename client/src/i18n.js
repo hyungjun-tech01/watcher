@@ -53,7 +53,7 @@ i18n
   .use(initReactI18next)
   .init({
     //resources,
-    // lng:'ko',
+    lng:'ko',
     resources: embeddedLocales,
     fallbackLng: 'ko',
     supportedLngs: languages,

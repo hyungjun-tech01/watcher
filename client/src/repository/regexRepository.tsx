@@ -24,7 +24,6 @@ export const RegexRepository = selector({
 
         const modifyRegex = getCallback(({set, snapshot}) => async (newRegex) => {
             const input_json = JSON.stringify(newRegex);
-            console.log(`[ modifynewRegex ] input : `, input_json);
             try{
                 const response = await fetch(`${BASE_PATH}/modifyRegex`, {
                     method: "POST",

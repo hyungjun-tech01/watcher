@@ -73,7 +73,6 @@ interface ForgotPasswordProps {
             email: data.get("email"),
             password: data.get("password"),
           };
-          console.log(user_data);
           onValid(user_data);
         },
         []

@@ -104,7 +104,6 @@ const createMessage = (error: IError) => {
       );
       const onValid = async (data: any) => {
         setIsSubmitting(true);
-        console.log(data);
         const response = await modifySecurityGroupAdmin(data);
         if (response.message === 'success') {
 

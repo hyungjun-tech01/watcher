@@ -35,7 +35,6 @@ function RegExViewContent() {
               regex_value : value ,
               modify_user : cookies.WatcherWebUserId
           };
-          console.log(`[ handleAddNewCompany ]`, newRegex);
           const result = modifyRegex(newRegex);
       }
 

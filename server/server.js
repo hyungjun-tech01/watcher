@@ -187,18 +187,19 @@ app.post('/passwordChange', async(req, res) => {
         let iv = Buffer.alloc(16);
         Buffer.from(process.env.CRYPTO_IV).copy(iv);
         
-        const cipher = crypto.createCipheriv(algorithm, key, iv); 
+        const cipherOld = crypto.createCipheriv(algorithm, key, iv); 
 
-        let oldPassword = cipher.update(old_password, 'utf8', 'base64');
-        oldPassword += cipher.final('base64');
+        let oldPassword = cipherOld.update(old_password, 'utf8', 'base64');
+        oldPassword += cipherOld.final('base64');
 
-        if ( users.rows.password !== oldPassword){
-            return  res.json({message:'Invalid userName or email'});
+        //입력한 패스워드와 db저장됨 패스워드가 같다면, 패스워드 변경
+        if ( users.rows[0].password !== oldPassword){
+            return  res.json({message:'Invalid userName or password'});
         }
 
-        let newPassword = cipher.update(new_password, 'utf8', 'base64');
-        newPassword += cipher.final('base64');
-
+        const cipherNew = crypto.createCipheriv(algorithm, key, iv); 
+        let newPassword = cipherNew.update(new_password, 'utf8', 'base64');
+        newPassword += cipherNew.final('base64');
 
         const response = await pool.query(`
                     update tbl_user 
@@ -499,8 +500,6 @@ app.post('/modifyPersonalRegEx', async(req,res) => {
         res.json({ out_regexName: out_regexName,  out_create_user:out_create_user, 
            out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user }); // 결과 리턴을 해 줌 .  
    
-        console.log({ out_regexName: out_regexName,  out_create_user:out_create_user, 
-               out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user });
     }catch(err){
         console.error(err);
         res.json({message:err.message});
@@ -642,8 +641,6 @@ app.post('/modifySecurityGroupAdmin', async(req, res) => {
         security_admin_name,
         modify_user } = req.body;
 
-        console.log('security_group_name, security_group_name '. security_group_name, security_admin_name);
-
     try{        
         if(action_type === 'ADD'){
 
@@ -664,7 +661,6 @@ app.post('/modifySecurityGroupAdmin', async(req, res) => {
             values(   $1, CURRENT_DATE, $2)`,[security_admin_name,security_group_name ]);            
         }
         if(action_type === 'DELETE'){
-           console.log([security_group_name, security_admin_name]);
             const securityGroup = await pool.query(` 
                 delete from tbl_security_group_admin
                 where security_group_name = $1
@@ -934,8 +930,6 @@ app.post('/modifyRegex', async(req, res) => {
         res.json({ message:'success',  out_create_user:out_create_user, 
            out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user }); // 결과 리턴을 해 줌 .  
    
-        //console.log({ out_create_user:out_create_user, 
-        //       out_create_date:out_create_date, out_modify_date:out_modify_date, out_recent_user:out_recent_user });
     }catch(err){
         console.error(err);
         res.json({message:err.message});   

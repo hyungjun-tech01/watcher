@@ -72,7 +72,6 @@ export const AuditRepository = selector({
                   
                   const blob = await response.blob();
                   set(atomsAuditPdfContent, blob); // Blob을 직접 상태에 저장
-                  console.log("ok");
             }catch(err){
                 console.error(err);
             }

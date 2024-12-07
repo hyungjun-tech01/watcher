@@ -7,7 +7,7 @@ export const UserRepository = selector({
     key: 'AuditRepo',
     get: ({getCallback}) => {
         const validateUser = getCallback(({set}) => async (data:IValidateUser) => {
-            console.log("Test");
+           
         });
         return {
             validateUser

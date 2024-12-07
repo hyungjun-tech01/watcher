@@ -14,7 +14,7 @@ const login = {
       password : '패스워드',
       forgotUserPassword :'비밀번호를 잊으셨나요?',
       resetPassword :'패스워드 초기화',
-      resetPasswordText : '새 패스워드로 비밀번호를 변경합니다.',
+      resetPasswordText : '사용자 이름과, 예전 패스워드를 확인 후 새 패스워드로 비밀번호를 변경합니다.',
       changePassword :'비밀번호 변경',
       invalid_userName:'사용자 이름이 유효하지 않습니다.',
     },

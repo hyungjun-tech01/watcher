@@ -41,7 +41,6 @@ const RegExTable = ({executeQuery, setExecuteQuery}: IRegExTable) => {
                 regex_value : '' ,
                 modify_user : cookies.WatcherWebUserId
             };
-            console.log(`[ handleAddNewCompany ]`, newRegex);
             const result = modifyRegex(newRegex);
         }
 
@@ -57,7 +56,6 @@ const RegExTable = ({executeQuery, setExecuteQuery}: IRegExTable) => {
                 regex_value : value ,
                 modify_user : cookies.WatcherWebUserId
             };
-            console.log(`[ handleAddNewCompany ]`, newRegex);
             const result = modifyRegex(newRegex);
         }
         setModalOpen(false);

@@ -26,7 +26,6 @@ export async function  apiLoginValidate(data:IValidateUser) {
             body:JSON.stringify(data)
            }); 
         const responseMessage = await response.json();
-        console.log(responseMessage);
            return(responseMessage);
     }catch(err){
         console.error(err);

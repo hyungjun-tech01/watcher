@@ -58,7 +58,6 @@ const AuditLogTable = ({userName, detectValue, fromTime, toTime, privacyText, ex
 
   const openPdfModal = useCallback((value:any) => {
     setpdfUrl(value);
-    console.log('pdfpath',value);
     queryPdfContent(value);
     setIsPdfModalOpen(true)}, []);
 
