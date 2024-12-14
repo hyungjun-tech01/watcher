@@ -742,7 +742,8 @@ app.post('/getUsers', async(req, res) => {
         const users = await pool.query(` 
         select  b.user_name, b.full_name , b.department, deleted_date
         from tbl_user b
-        where deleted_date is null`,[]);
+        where deleted_date is null
+        order by b.full_name`,[]);
         res.json(users.rows);
         res.end();
     }catch(err){
@@ -756,7 +757,8 @@ app.post('/getDepts', async(req, res) => {
     try{
         const users = await pool.query(` 
         select  dept_id, dept_name, security_group_name
-        from tbl_dept_info`,[]);
+        from tbl_dept_info
+        order by dept_name`,[]);
         res.json(users.rows);
         res.end();
     }catch(err){
