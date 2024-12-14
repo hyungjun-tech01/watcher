@@ -741,10 +741,10 @@ app.post('/getUsers', async(req, res) => {
     try{
         const users = await pool.query(` 
         select  b.user_name, b.full_name , a.dept_name department, deleted_date
-        from tbl_user b, tbl_dept_info a
-        where deleted_date is null
-        and b.dept_id = a.dept_id
-        order by b.full_name`,[]);
+        FROM tbl_user b LEFT JOIN tbl_dept_info a
+          ON b.dept_id = a.dept_id
+        WHERE b.deleted_date IS NULL
+        ORDER BY b.full_name;`,[]);
         res.json(users.rows);
         res.end();
     }catch(err){
