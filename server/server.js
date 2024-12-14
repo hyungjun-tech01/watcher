@@ -512,16 +512,8 @@ app.post('/getSecurityGroup', async(req, res) => {
     const { 
         username } = req.body;
     try{
-        const securityGroup = await pool.query(` 
-        select b.security_group_id , b.security_group_name
-        from tbl_security_group_admin a, tbl_security_group b
-        where a.security_group_admin_name = $1
-        and a.security_group_name = b.security_group_name
-        and a.security_group_admin_start_date <= CURRENT_DATE
-        and (a.security_group_admin_end_date is null or a.security_group_admin_end_date >= CURRENT_DATE)
-        order by b.security_group_name`,[username]);
 
-        if (securityGroup.rows.some(row => row.security_group_name === 'ADMIN')) {
+        if (username === 'admin' || username === 'administrator') {
             // security_group_name이 'ADMIN'인 경우: username에 상관없이 모든 데이터를 조회
 
             const allData = await pool.query(`
@@ -530,8 +522,19 @@ app.post('/getSecurityGroup', async(req, res) => {
             `);
             res.json(allData.rows);
         }else{
+            const securityGroup = await pool.query(` 
+            select b.security_group_id , b.security_group_name
+            from tbl_security_group_admin a, tbl_security_group b
+            where a.security_group_admin_name = $1
+            and a.security_group_name = b.security_group_name
+            and a.security_group_admin_start_date <= CURRENT_DATE
+            and (a.security_group_admin_end_date is null or a.security_group_admin_end_date >= CURRENT_DATE)
+            order by b.security_group_name`,[username]);
+
             res.json(securityGroup.rows);
         }        
+
+   
         res.end();
     }catch(err){
         console.log(err);
@@ -547,11 +550,8 @@ app.post('/modifySecurityGroup', async(req, res) => {
         security_group_memo,
         modify_user } = req.body;
     try{
-        const adminCheck = await pool.query(`SELECT security_group_name 
-                                                FROM tbl_security_group_admin 
-                                                WHERE security_group_admin_name = $1`, [modify_user]);
 
-        if (adminCheck.rows.some(row => row.security_group_name === 'ADMIN')) {
+        if (modify_user === 'admin' || modify_user === 'administrator') {
         }else{
             console.log('Not Admin');
             return res.json({message:'Not Admin'});
@@ -566,7 +566,6 @@ app.post('/modifySecurityGroup', async(req, res) => {
             }else{
                 return res.json({message:'Duplicate Security Group'});
             }
-
 
             const securityGroup = await pool.query(` 
             insert into tbl_security_group( security_group_name, security_group_memo)
@@ -683,10 +682,9 @@ app.post('/getSecurityGroupDept', async(req, res) => {
         security_group_name } = req.body;
     try{
         const securityGroup = await pool.query(` 
-        select a.security_group_name, b.dept_id, b.dept_name 
-            from tbl_security_group a, tbl_dept_info b
-            where a.security_group_name = b.security_group_name
-            and a.security_group_name = $1`,[security_group_name]);
+        select b.security_group_name, b.dept_id, b.dept_name 
+            from tbl_dept_info b
+            where b.security_group_name = $1`,[security_group_name]);
         res.json(securityGroup.rows);
         res.end();
     }catch(err){
@@ -716,18 +714,17 @@ app.post('/modifySecurityGroupDept', async(req, res) => {
                 return res.json({message:'Duplicate Security Group Dept'});
             }
 
-
             const securityGroup = await pool.query(` 
-            insert into tbl_dept_info(  dept_name, security_group_name)
-            values(   $1, $2)`,[security_dept_name,security_group_name ]);            
+                update tbl_dept_info
+                set security_group_name = $1
+                where dept_name = $2`,[security_group_name, security_dept_name]);
         }
         if(action_type === 'DELETE'){
-            // admin 과 dept가 존재하면 삭제 금지
-           
+          
             const securityGroup = await pool.query(` 
-                delete from tbl_dept_info
-                where security_group_name = $1
-                and dept_name = $2`,[security_group_name, security_dept_name]);
+                update tbl_dept_info
+                   set security_group_name = null
+                where dept_name = $1`,[security_dept_name]);  // security_group_name을 null 로 update
         }
 
         res.json({ message:'success' }); // 결과 리턴을 해 줌 .  
@@ -746,6 +743,20 @@ app.post('/getUsers', async(req, res) => {
         select  b.user_name, b.full_name , b.department, deleted_date
         from tbl_user b
         where deleted_date is null`,[]);
+        res.json(users.rows);
+        res.end();
+    }catch(err){
+        console.log(err);
+        res.json({message:err});        
+        res.end();
+    }
+});
+
+app.post('/getDepts', async(req, res) => {
+    try{
+        const users = await pool.query(` 
+        select  dept_id, dept_name, security_group_name
+        from tbl_dept_info`,[]);
         res.json(users.rows);
         res.end();
     }catch(err){

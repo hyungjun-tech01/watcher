@@ -54,3 +54,7 @@ export const atomsUserData = atom<IUser[]>({
     default: []
 });
 
+export const atomsDeptData = atom<ISecurityGroupDept[]>({
+    key: 'Dept',
+    default: []
+});

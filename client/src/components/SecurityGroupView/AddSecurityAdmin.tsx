@@ -18,7 +18,8 @@ import {
     MenuItem,
     Select,
     FormHelperText,
-    InputLabel
+    InputLabel,
+    Autocomplete
   } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useRecoilValue } from 'recoil';
@@ -67,26 +68,43 @@ const createMessage = (error: IError) => {
     handleClose: () => void;
     loadSecurityGroupAdmin : (data:any)=>void;
   }
+  interface userDataLovType {
+    id: string;
+    label :string;
+}
 
   function AddSecurityAdmin({ open, securityGroupName, handleClose, loadSecurityGroupAdmin }: AddSecurityProps){
     const { t } = useTranslation();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<IError>(initErrorContent);    
-    const { modifySecurityGroupAdmin, loadAllUser4Security} = useRecoilValue(SecurityGroupRepository);
+    const { modifySecurityGroupAdmin, loadAllUser4Security, } = useRecoilValue(SecurityGroupRepository);
     const securityUserData = useRecoilValue(atomsUserData);
 
+
     const [cookies, setCookie, removeCookie] = useCookies(['WatcherWebUserId','WatcherWebUserName', 'WatcherWebAuthToken']);
-    const [selectedValue, setSelectedValue] = useState<string>('');
+    const [selectedValue, setSelectedValue] = useState<userDataLovType|null>(null);
+
+    // const skills = ['HTML', 'Typescript', 'React'];
+  
+    const userDataLov = securityUserData.map( (user)=>({
+        id: user.user_name, 
+        label: user.full_name + '(' + user.department +')'
+    }));
 
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>)=>{
-      setSelectedValue(event?.target.value as string);
+    const handleChange = (newValue:userDataLovType|null)=>{
+      setSelectedValue(newValue);
     }  
+
                   
     useEffect(() => {
-      setSelectedValue('');
-      loadAllUser4Security();
+      if (open) {
+        setError(initErrorContent);
+        setSelectedValue(null); // `Dialog`가 열릴 때만 초기화
+        loadAllUser4Security();
+      }
     }, [open]);
+
 
     const addSecurityAdmin = useCallback(
         (event: React.FormEvent<HTMLFormElement>) => {
@@ -95,12 +113,12 @@ const createMessage = (error: IError) => {
           const _data = {
             action_type : 'ADD',
             security_group_name : data.get("dept_security_group_name"),
-            security_admin_name: data.get("security_admin_name"),
+            security_admin_name:  selectedValue?.id,  // data.get("security_admin_name"),
             modify_user : cookies.WatcherWebUserId,
           };
           onValid(_data);
         },
-        []
+       [selectedValue]
       );
       const onValid = async (data: any) => {
         setIsSubmitting(true);
@@ -147,23 +165,25 @@ const createMessage = (error: IError) => {
                         readOnly: true, // 읽기 전용으로 설정
                     }}
                 />   
-                 <TextField  
-                    label={t("common.security_admin_name")}
-                    id="security_admin_name"
-                    name="security_admin_name"
-                    select
-                    value={selectedValue}
-                    placeholder=  {t('common.security_admin_name')}
-                    onChange={handleChange}
-                    fullWidth
-                    helperText={t(error.content)}
-                 >
-                    {securityUserData.map((user) => (
-                    <MenuItem key={user.user_name} value={user.user_name}>
-                        {user.full_name + '('+ user.department +')'}
-                    </MenuItem>
-                    ))}
-                </TextField>                                     
+
+                <Autocomplete 
+                  id="security_admin_name"
+                  fullWidth
+                  options={userDataLov} 
+                  renderInput={(params:any)=> <TextField {...params} label= {t('common.security_group_name')}/>}
+                  value={selectedValue||null}
+                  onChange={(event:any, newValue:userDataLovType|null)=>handleChange(newValue)}
+                  isOptionEqualToValue={(option, value) => value ? option.id === value.id : false}
+                  getOptionLabel={(option) => option.label || ''} // 안전한 렌더링
+                />       
+
+                <Typography
+                    variant="body2"
+                    sx={{ mt: 5, mb: 5, ml:2,
+                        }}
+                > {t(error.content)}
+                </Typography>
+                     
             </DialogContent>
             <DialogActions sx={{ pb: 3, px: 3 }}>
                 <Button onClick={handleClose}>Cancel</Button>

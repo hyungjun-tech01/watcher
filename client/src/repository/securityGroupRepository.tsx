@@ -1,6 +1,6 @@
 import { selector } from 'recoil';
 import { atomsSecurityGroupData, atomsSecurityGroupAdminData,
-        atomsSecurityGroupDeptData, ISecuQueryCondi , atomsUserData} from "../atoms/atomsSecurityGroup";
+        atomsSecurityGroupDeptData, ISecuQueryCondi , atomsUserData, atomsDeptData} from "../atoms/atomsSecurityGroup";
 import Paths from "../constants/Paths";
 const BASE_PATH = Paths.BASE_PATH;
 
@@ -119,6 +119,24 @@ export const SecurityGroupRepository = selector({
             }
         });     
         
+        const loadAllDept4Security = getCallback(({set}) => async () => {
+            try{
+                const response = await fetch(`${BASE_PATH}/getDepts`,{
+                    method: "POST", 
+                    headers:{'Content-Type':'application/json'},
+                   }); 
+                const json = await response.json();
+                if(json.message) {
+                    console.log('loadAllDept4Security: ', json.message);
+                } else {
+                    set(atomsDeptData, json);
+                }
+            }catch(err){
+                console.error(err);
+                set(atomsDeptData, []);
+            }
+        });   
+
         const modifySecurityGroupAdmin = getCallback(({set, snapshot}) => async (newSecurityGroup) => {
             const input_json = JSON.stringify(newSecurityGroup);
             try{
@@ -144,6 +162,7 @@ export const SecurityGroupRepository = selector({
             modifySecurityGroupDept,
             loadAllUser4Security,
             modifySecurityGroupAdmin,
+            loadAllDept4Security,
         };
     },
 });
