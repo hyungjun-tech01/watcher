@@ -170,7 +170,7 @@ const createMessage = (error: IError) => {
                   id="security_admin_name"
                   fullWidth
                   options={userDataLov} 
-                  renderInput={(params:any)=> <TextField {...params} label= {t('common.security_group_name')}/>}
+                  renderInput={(params:any)=> <TextField {...params} label= {t('common.security_admin_name')}/>}
                   value={selectedValue||null}
                   onChange={(event:any, newValue:userDataLovType|null)=>handleChange(newValue)}
                   isOptionEqualToValue={(option, value) => value ? option.id === value.id : false}
