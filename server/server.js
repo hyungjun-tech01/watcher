@@ -618,12 +618,23 @@ app.post('/getSecurityGroupAdmin', async(req, res) => {
         security_group_name } = req.body;
     try{
         const securityGroup = await pool.query(` 
-        select a.security_group_name, a.security_group_admin_name , b.full_name , b.department
-        from tbl_security_group_admin a, tbl_user b
-        where a.security_group_admin_name = b.user_name
-        and a.security_group_name = $1
-        and a.security_group_admin_start_date <= CURRENT_DATE
-                        and (a.security_group_admin_end_date is null or a.security_group_admin_end_date >= CURRENT_DATE)`,[security_group_name]);
+        SELECT 
+            a.security_group_name, 
+            a.security_group_admin_name, 
+            b.full_name, 
+            c.dept_name AS department
+        FROM 
+            tbl_security_group_admin a
+        JOIN 
+            tbl_user b 
+            ON a.security_group_admin_name = b.user_name
+        LEFT JOIN 
+            tbl_dept_info c 
+            ON b.dept_id = c.dept_id
+        WHERE 
+            a.security_group_name = $1
+            AND a.security_group_admin_start_date <= CURRENT_DATE
+            AND (a.security_group_admin_end_date IS NULL OR a.security_group_admin_end_date >= CURRENT_DATE)`,[security_group_name]);
         res.json(securityGroup.rows);
         res.end();
     }catch(err){
