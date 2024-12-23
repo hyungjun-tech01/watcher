@@ -126,7 +126,7 @@ app.post('/login', async(req, res) => {
     const {username, password} = req.body;
     try{
         
-        const users = await pool.query('SELECT user_id, user_name, password FROM tbl_user WHERE user_name = $1', [username]);
+        const users = await pool.query('SELECT uid, user_name, password FROM tbl_customer_user_info WHERE user_name = $1', [username]);
         if(!users.rows.length) return res.json({message:'Invalid userName or password'});
    
         // security_group_admin 있는 사람만 로그인 
@@ -173,7 +173,7 @@ app.post('/login', async(req, res) => {
 app.post('/passwordChange', async(req, res) => {
     const {username, old_password, new_password} = req.body;
     try{
-        const users = await pool.query('SELECT user_id, user_name, password FROM tbl_user WHERE user_name = $1 ', [username]);
+        const users = await pool.query('SELECT uid, user_name, password FROM tbl_customer_user_info WHERE user_name = $1 ', [username]);
         if(!users.rows.length) return res.json({message:'Invalid userName'});
    
 
@@ -202,7 +202,7 @@ app.post('/passwordChange', async(req, res) => {
         newPassword += cipherNew.final('base64');
 
         const response = await pool.query(`
-                    update tbl_user 
+                    update tbl_customer_user_info 
                         set password    = $1
                         where user_name = $2
                 `,[newPassword,  username]);
@@ -626,7 +626,7 @@ app.post('/getSecurityGroupAdmin', async(req, res) => {
         FROM 
             tbl_security_group_admin a
         JOIN 
-            tbl_user b 
+            tbl_customer_user_info b 
             ON a.security_group_admin_name = b.user_name
         LEFT JOIN 
             tbl_dept_info c 
@@ -751,11 +751,10 @@ app.post('/modifySecurityGroupDept', async(req, res) => {
 app.post('/getUsers', async(req, res) => {
     try{
         const users = await pool.query(` 
-        select  b.user_name, b.full_name , a.dept_name department, deleted_date
-        FROM tbl_user b LEFT JOIN tbl_dept_info a
+        select  b.user_name, b.full_name , a.dept_name department
+        FROM tbl_customer_user_info b LEFT JOIN tbl_dept_info a
           ON b.dept_id = a.dept_id
-        WHERE b.deleted_date IS NULL
-        ORDER BY b.full_name;`,[]);
+        ORDER BY b.full_name`,[]);
         res.json(users.rows);
         res.end();
     }catch(err){
