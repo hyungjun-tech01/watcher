@@ -584,7 +584,7 @@ app.post('/modifySecurityGroup', async(req, res) => {
             }
 
             const deptCheck = await pool.query(`SELECT security_group_name 
-                                                    FROM tbl_dept_info 
+                                                    FROM tbl_customer_dept_info 
                                                     WHERE security_group_name = $1`, [security_group_name]);
             if(!deptCheck.rows.length){
             }else{
@@ -629,7 +629,7 @@ app.post('/getSecurityGroupAdmin', async(req, res) => {
             tbl_customer_user_info b 
             ON a.security_group_admin_name = b.user_name
         LEFT JOIN 
-            tbl_dept_info c 
+            tbl_customer_dept_info c 
             ON b.dept_id = c.dept_id
         WHERE 
             a.security_group_name = $1
@@ -694,7 +694,7 @@ app.post('/getSecurityGroupDept', async(req, res) => {
     try{
         const securityGroup = await pool.query(` 
         select b.security_group_name, b.dept_id, b.dept_name 
-            from tbl_dept_info b
+            from tbl_customer_dept_info b
             where b.security_group_name = $1`,[security_group_name]);
         res.json(securityGroup.rows);
         res.end();
@@ -717,7 +717,7 @@ app.post('/modifySecurityGroupDept', async(req, res) => {
         if(action_type === 'ADD'){
 
             const dupCheck = await pool.query(`SELECT security_group_name 
-                                                FROM tbl_dept_info 
+                                                FROM tbl_customer_dept_info 
                                                 WHERE security_group_name = $1
                                                 and dept_name = $2`, [security_group_name, security_dept_name]);
             if(!dupCheck.rows.length){
@@ -726,14 +726,14 @@ app.post('/modifySecurityGroupDept', async(req, res) => {
             }
 
             const securityGroup = await pool.query(` 
-                update tbl_dept_info
+                update tbl_customer_dept_info
                 set security_group_name = $1
                 where dept_name = $2`,[security_group_name, security_dept_name]);
         }
         if(action_type === 'DELETE'){
           
             const securityGroup = await pool.query(` 
-                update tbl_dept_info
+                update tbl_customer_dept_info
                    set security_group_name = null
                 where dept_name = $1`,[security_dept_name]);  // security_group_name을 null 로 update
         }
@@ -752,7 +752,7 @@ app.post('/getUsers', async(req, res) => {
     try{
         const users = await pool.query(` 
         select  b.user_name, b.full_name , a.dept_name department
-        FROM tbl_customer_user_info b LEFT JOIN tbl_dept_info a
+        FROM tbl_customer_user_info b LEFT JOIN tbl_customer_dept_info a
           ON b.dept_id = a.dept_id
         ORDER BY b.full_name`,[]);
         res.json(users.rows);
@@ -768,7 +768,7 @@ app.post('/getDepts', async(req, res) => {
     try{
         const users = await pool.query(` 
         select  dept_id, dept_name, security_group_name
-        from tbl_dept_info
+        from tbl_customer_dept_info
         order by dept_name`,[]);
         res.json(users.rows);
         res.end();
